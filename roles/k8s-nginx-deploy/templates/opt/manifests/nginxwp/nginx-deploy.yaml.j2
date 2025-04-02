@@ -3,45 +3,45 @@
 apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
-  name: "{{ k8s_nginx_wp_deploy_cfg['name'] }}"
+  name: "{{ k8s_nginx_deploy_cfg['name'] }}"
   namespace: "{{ k8s_registry_namespase }}"
 spec:
-  replicas: "{{ k8s_nginx_wp_deploy_number }}"
+  replicas: "{{ k8s_nginx_deploy_number }}"
   selector:
     matchLabels:
-      app: "{{ k8s_nginx_wp_deploy_cfg['name'] }}"
+      app: "{{ k8s_nginx_deploy_cfg['name'] }}"
   template:
     metadata:
       labels:
-        app: "{{ k8s_nginx_wp_deploy_cfg['name'] }}"
+        app: "{{ k8s_nginx_deploy_cfg['name'] }}"
     spec:
       containers:
-        - name: "{{ k8s_nginx_wp_deploy_config['name'] }}"
-          image: "{{ k8s_nginx_wp_deploy_config['image'] }}:{{ k8s_nginx_wp_deploy_config['tag'] }}"
+        - name: "{{ k8s_nginx_deploy_config['name'] }}"
+          image: "{{ k8s_nginx_deploy_config['image'] }}:{{ k8s_nginx_deploy_config['tag'] }}"
           ports:
-            - containerPort: "{{ k8s_nginx_wp_deploy_cfg['deploy_port'] }}"
+            - containerPort: "{{ k8s_nginx_deploy_cfg['deploy_port'] }}"
           volumeMounts:
-            - name: "{{ k8s_nginx_wp_deploy_cfg['config_name'] }}"
+            - name: "{{ k8s_nginx_deploy_cfg['config_name'] }}"
               mountPath: /etc/nginx/nginx.conf
               subPath: nginx.conf
-            - name: "{{ k8s_nginx_wp_deploy_cfg['config_name'] }}"
+            - name: "{{ k8s_nginx_deploy_cfg['config_name'] }}"
               mountPath: /etc/nginx/sites-available/wordpress.local.conf
               subPath: wordpress.local.conf
-            - name: "{{ k8s_nginx_wp_deploy_cfg['config_name'] }}"
+            - name: "{{ k8s_nginx_deploy_cfg['config_name'] }}"
               mountPath: /etc/nginx/sites-available/registry.local.conf
               subPath: registry.local.conf
-            - name: "{{ k8s_nginx_wp_deploy_cfg['config_name'] }}"
+            - name: "{{ k8s_nginx_deploy_cfg['config_name'] }}"
               mountPath: /etc/nginx/upstreams/registry.conf
               subPath: registry.conf
-            - name: "{{ k8s_nginx_wp_deploy_cfg['config_name'] }}"
+            - name: "{{ k8s_nginx_deploy_cfg['config_name'] }}"
               mountPath: /etc/nginx/upstreams/wordpress.conf
               subPath: wordpress.conf
-            - name: "{{ k8s_nginx_wp_deploy_cfg['config_name'] }}"
+            - name: "{{ k8s_nginx_deploy_cfg['config_name'] }}"
               mountPath: /etc/nginx/conf.d/default.conf
               subPath: default.conf
       volumes:
-        - name: "{{ k8s_nginx_wp_deploy_cfg['config_name'] }}"
+        - name: "{{ k8s_nginx_deploy_cfg['config_name'] }}"
           configMap:
-            name: "{{ k8s_nginx_wp_deploy_cfg['configmap_name'] }}"
+            name: "{{ k8s_nginx_deploy_cfg['configmap_name'] }}"
       nodeSelector:
-        role: {{ k8s_nginx_wp_deploy_cfg['nginx_node'] }}
+        role: {{ k8s_nginx_deploy_cfg['nginx_node'] }}

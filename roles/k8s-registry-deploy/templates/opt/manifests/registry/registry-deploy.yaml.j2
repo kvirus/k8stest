@@ -17,8 +17,8 @@ spec:
         app: "{{ k8s_registry_deploy_config['deploy_name'] }}"
     spec:
       containers:
-        - name: "{{ k8s_registry_container_config['name'] }}"
-          image: "{{ k8s_registry_container_config['image'] }}:{{ k8s_registry_container_config['tag'] }}"
+        - name: "{{ 8s_registry_deploy_container_config['name'] }}"
+          image: "{{ 8s_registry_deploy_container_config['image'] }}:{{ 8s_registry_deploy_container_config['tag'] }}"
           ports:
             - containerPort: "{{ k8s_registry_deploy_config['container_port'] }}"
       nodeSelector:
