@@ -13,15 +13,28 @@
   tags:
     - k8s-wordpress-deploy
 
+# - name: "Создание директории для хранения статики"
+#   file:
+#     path: "{{ item['path'] }}"
+#     mode: "{{ item['mode'] | d('0744') }}"
+#     state: "directory"
+#   loop:
+#     - { path: "{{ k8s_wordpress_hostdir }}" }
+#   delegate_to: "{{ item }}"
+#   with_items: "{{ groups['workers'] }}"
+#   when:
+#     - ansible_os_family == "Debian"
+#   tags:
+#     - k8s-wordpress-deploy
+
 - name: "Создание директории для хранения статики"
   file:
-    path: "{{ item['path'] }}"
-    mode: "{{ item['mode'] | d('0744') }}"
+    path: "{{ k8s_wordpress_hostdir }}"
+    mode: '0744'
     state: "directory"
-  loop:
-    - { path: "{{ k8s_wordpress_hostdir }}" }
   delegate_to: "{{ item }}"
-  with_items: "{{ groups['workers'] }}"
+  loop:
+    - { path: "{{ groups['workers'] }}" }
   when:
     - ansible_os_family == "Debian"
   tags:
