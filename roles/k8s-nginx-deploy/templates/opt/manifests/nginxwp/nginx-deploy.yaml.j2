@@ -4,9 +4,9 @@ apiVersion: "apps/v1"
 kind: "Deployment"
 metadata:
   name: "{{ k8s_nginx_deploy_cfg['name'] }}"
-  namespace: "{{ k8s_registry_namespase }}"
+  namespace: "{{ k8s_nginx_deploy_cfg['namespase'] }}"
 spec:
-  replicas: "{{ k8s_nginx_deploy_number }}"
+  replicas: "{{ k8s_nginx_deploy_cfg['replicas'] }}"
   selector:
     matchLabels:
       app: "{{ k8s_nginx_deploy_cfg['name'] }}"

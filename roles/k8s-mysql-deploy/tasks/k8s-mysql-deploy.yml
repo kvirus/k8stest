@@ -19,7 +19,7 @@
     state: "directory"
   loop:
     - { path: "{{ k8s_mysql_deploy_db_dir }}" }
-  delegate_to: "{{ groups['workers'][1] }}"
+  delegate_to: "{{ groups['workers'][0] }}" # !!!! ИСПРАВИТЬ НА delegate_to: "{{ groups['workers'][1] }}"
   when:
     - ansible_os_family == "Debian"
   tags:
@@ -56,7 +56,8 @@
   kubernetes.core.k8s:
     src: "{{ item }}"
     state: present
-  loop: "{{ lookup('fileglob', k8s_mysql_deploy_manifests_dir + '/*.yaml', wantlist=true) }}"
+  #loop: "{{ lookup('fileglob', k8s_mysql_deploy_manifests_dir + '/*.yaml', wantlist=true) }}"
+  loop: "{{ k8s_mysql_deploy_manifests }}"
   when:
     - ansible_os_family == "Debian"
   tags:

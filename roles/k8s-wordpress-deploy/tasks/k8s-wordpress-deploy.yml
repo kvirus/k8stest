@@ -20,7 +20,8 @@
     state: "directory"
   loop:
     - { path: "{{ k8s_wordpress_hostdir }}" }
-  delegate_to: "{{ groups['workers'] }}"
+  delegate_to: "{{ item }}"
+  with_items: "{{ groups['workers'] }}"
   when:
     - ansible_os_family == "Debian"
   tags:

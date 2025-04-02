@@ -22,7 +22,7 @@ k8s_mysql_deploy_container_config:
   image: "192.168.0.1:5000/my_mysql"
   tag: '9.2.0'
 
-# k8s_mysql_deploy_manifests:
-#   - mysql-secrets.yaml
-#   - mysql-deploy.yaml
-#   - mysql-service.yaml
+k8s_mysql_deploy_manifests:
+  - mysql-secrets.yaml
+  - mysql-deploy.yaml
+  - mysql-service.yaml
