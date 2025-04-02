@@ -12,8 +12,10 @@ k8s_wordpress_container_config:
 k8s_wordpress_cfg:
   name: "wordpress"
   namespace: "wordpress"
+  service_name: "wordpress-service"
   secret_name: "wordpress-secrets"
   port: '80'
+  targetport: '80'
   deploy_name: "wordpress"
   replicas: '2'
   protocol: "TCP"
@@ -24,4 +26,4 @@ k8s_wordpress_cfg:
 k8s_wordpress_manifests:
   - wordpress-secrets.yaml
   - wordpress-deploy.yaml
-  - wordpress-service.yaml
+  - wordpress-deploy-service.yaml

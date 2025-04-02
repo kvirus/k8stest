@@ -45,6 +45,7 @@
     src: "{{ k8s_nginx_deploy_manifests_dir }}/{{ item }}"
     state: present
   loop: "{{ k8s_nginx_deploy_manifests }}"
+  delegate_to: "{{ groups['k8s-master'][0] }}"
   when:
     - ansible_os_family == "Debian"
   tags:

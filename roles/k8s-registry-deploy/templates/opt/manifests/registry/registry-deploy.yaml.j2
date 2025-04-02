@@ -7,7 +7,7 @@ metadata:
   namespace: "{{ k8s_registry_deploy_config['namespace'] }}"
 spec:
   serviceName: "{{ k8s_registry_deploy_config['deploy_name'] }}"
-  replicas: "{{ k8s_registry_deploy_config['replicas'] }}"
+  replicas: {{ k8s_registry_deploy_config['replicas'] }}
   selector:
     matchLabels:
       app: "{{ k8s_registry_deploy_config['deploy_name'] }}"

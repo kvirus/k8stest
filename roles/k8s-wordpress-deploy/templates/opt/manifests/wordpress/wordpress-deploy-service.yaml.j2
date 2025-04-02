@@ -1,0 +1,15 @@
+{#Сервис для Registry#}
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "{{ k8s_wordpress_cfg['service_name'] }}"
+  namespace: "{{ k8s_wordpress_cfg['namespace'] }}"
+spec:
+  type: "{{ k8s_wordpress_cfg['service_type'] }}"
+  selector:
+    app: "{{ k8s_wordpress_cfg['service_name'] }}"
+  ports:
+    - protocol: "{{ k8s_wordpress_cfg['protocol'] }}"
+      port: {{ k8s_wordpress_cfg['port'] }}
+      targetPort: {{ k8s_wordpress_cfg['targetport'] }}

@@ -13,28 +13,13 @@
   tags:
     - k8s-wordpress-deploy
 
-# - name: "Создание директории для хранения статики"
-#   file:
-#     path: "{{ item['path'] }}"
-#     mode: "{{ item['mode'] | d('0744') }}"
-#     state: "directory"
-#   loop:
-#     - { path: "{{ k8s_wordpress_hostdir }}" }
-#   delegate_to: "{{ item }}"
-#   with_items: "{{ groups['workers'] }}"
-#   when:
-#     - ansible_os_family == "Debian"
-#   tags:
-#     - k8s-wordpress-deploy
-
 - name: "Создание директории для хранения статики"
   file:
     path: "{{ k8s_wordpress_hostdir }}"
     mode: '0744'
     state: "directory"
   delegate_to: "{{ item }}"
-  loop:
-    - { path: "{{ groups['workers'] }}" }
+  loop: "{{ groups['workers'] }}"
   when:
     - ansible_os_family == "Debian"
   tags:
@@ -59,18 +44,20 @@
     group: "{{ item['group'] | d('root') }}"
     mode: "{{ item['mode'] | d('0644') }}"
   loop:
-    - { src: "opt/manifests/wordpress/wordpress-deploy.yml.j2", dest: "{{ k8s_wordpress_manifests_dir }}/wordpress-deploy.yml"}
+    - { src: "opt/manifests/wordpress/wordpress-deploy.yaml.j2", dest: "{{ k8s_wordpress_manifests_dir }}/wordpress-deploy.yaml"}
     - { src: "opt/manifests/wordpress/wordpress-secrets.yaml.j2", dest: "{{ k8s_wordpress_manifests_dir }}/wordpress-secrets.yaml"}
+    - - { src: "opt/manifests/wordpress/wordpress-deploy-service.yaml.j2", dest: "{{ k8s_wordpress_manifests_dir }}/wordpress-deploy-service.yaml"}
   when:
     - ansible_os_family == "Debian"
   tags:
     - k8s-wordpress-deploy
 
-- name: "Деплой манифестов Nginx"
+- name: "Деплой манифестов Wordpress"
   kubernetes.core.k8s:
     src: "{{ k8s_wordpress_manifests_dir }}/{{ item }}"
     state: present
   loop: "{{ k8s_wordpress_manifests }}"
+  delegate_to: "{{ groups['k8s-master'][0] }}"
   when:
     - ansible_os_family == "Debian"
   tags:
