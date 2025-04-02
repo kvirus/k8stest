@@ -1,0 +1,5 @@
+**/.DS_Store
+.ansible-lint
+.ansible
+.vscode
+main1.yml

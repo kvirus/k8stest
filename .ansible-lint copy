@@ -1,0 +1,17 @@
+use_default_rules: true
+skip_list:
+  - fqcn[action-core]
+  - fqcn[action]
+  - key-order[task]
+  - name[casing]
+  - name[missing]
+  - name[play]
+  - risky-shell-pipe
+  - yaml[line-length]
+  - literal-compare
+  - risky-file-permissions
+  - command-instead-of-shell
+  - no-changed-when
+  - package-latest
+  - name[template]
+  - sysctl

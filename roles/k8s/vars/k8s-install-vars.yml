@@ -1,0 +1,27 @@
+# Переменные для установки k8s
+---
+k8s_install_pkgs:
+  - kubelet
+  - kubeadm
+  - kubectl
+  - containerd
+
+k8s_centos_repo_cfg:
+  name: "Kubernetes"
+  describe: "Kubernetes repo 1.32"
+  repository: "https://pkgs.k8s.io/core:/stable:/v1.32/rpm/"
+  gpgkey: "https://pkgs.k8s.io/core:/stable:/v1.32/rpm/repodata/repomd.xml.key"
+
+k8s_ubuntu_repo:
+  repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /"
+  filename: "kubernetes"
+
+k8s_ubuntu_gpg_cfg:
+  url: "https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key"
+  keyring: "/etc/apt/keyrings/kubernetes-apt-keyring.gpg"
+
+k8s_cache_valid_time: '86400'
+
+k8s_services_list:
+  - { name: "kubeadm", enabled: true }
+  - { name: "kubelet", enabled: true }

@@ -1,0 +1,4 @@
+# Импорт кастомных задач
+---
+- import_tasks: 'k8s-registry-deploy-vars.yml'
+- import_tasks: 'k8s-registry-deploy.yml'

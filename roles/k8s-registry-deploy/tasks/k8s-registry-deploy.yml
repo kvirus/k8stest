@@ -1,0 +1,49 @@
+# Разворачиваем docker-registry в кластере как StatefulSet
+---
+- name: "Создание директории для манифестов"
+  file:
+    path: "{{ item['path'] }}"
+    mode: "{{ item['mode'] | d('0744') }}"
+    state: "directory"
+  loop:
+    - { path: "{{ k8s_registry_deploy_manifests_dir }}" }
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s-registry-deploy
+
+- name: "Перенос манифестов на мастер ноду"
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "opt/manifests/registry/registry-deploy.yaml.j2", dest: "{{ k8s_registry_deploy_manifests_dir }}/registry-deploy.yaml"}
+    - { src: "opt/manifests/registry/registry-service.yaml.j2", dest: "{{ k8s_registry_deploy_manifests_dir }}/registry-service.yaml"}
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s-registry-deploy
+
+- name: "Создание Namespace"
+  kubernetes.core.k8s:
+    name: "{{ k8s_registry_deploy_config['namespase'] }}"
+    api_version: "v1"
+    kind: "Namespace"
+    state: present
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s-registry-deploy
+
+- name: "Деплой манифестов docker-registry"
+  kubernetes.core.k8s:
+    src: "{{ item }}"
+    state: present
+  loop: "{{ lookup('fileglob', k8s_registry_deploy_manifests_dir + '/*.yaml', wantlist=true) }}"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s-registry-deploy

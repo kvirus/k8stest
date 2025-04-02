@@ -1,0 +1,7 @@
+# Подключаем файлы переменных
+---
+- name: "Подключаем переменные"
+  ansible.builtin.include_vars:
+    dir: vars/
+  tags:
+    - k8s-mysql-deploy

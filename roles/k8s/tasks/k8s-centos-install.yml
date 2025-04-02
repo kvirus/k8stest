@@ -1,0 +1,54 @@
+# Установка Kubernetes на Centos
+---
+- name: "Добавляем репозиторий Kubernetes"
+  yum_repository:
+    name: "{{ item['name'] }}"
+    description: "{{ item['describe'] }}"
+    baseurl: "{{ item['repository'] }}"
+    gpgkey: "{{ item['gpgkey'] }}"
+    gpgcheck: "{{ item['gpgcheck'] | d('true') }}"
+    enabled: "{{ item['enabled'] | d('true') }}"
+  loop:
+    - "{{ k8s_centos_repo_cfg }}"
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - k8s
+    - k8s-centos-install
+
+- name: "Устанавливаем пакеты K8s"
+  yum:
+    name: "{{ k8s_install_pkgs }}"
+    state: present
+    disable_excludes: "kubernetes"
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - k8s
+    - k8s-centos-install
+
+- name: "Блокируем обновления kubelet, kubeadm, kubectl"
+  lineinfile:
+    path: "{{ item['path'] }}"
+    line: "{{ item['line'] }}"
+    insertafter: "EOF"
+    create: true
+  loop:
+    - { path: "/etc/yum.conf", line: "exclude={{ k8s_install_pkgs[:-1] | join(' ') }}" }
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - k8s
+    - k8s-centos-install
+
+- name: "Запуск сервиса kubeadm, kubelet"
+  systemd:
+    name: "{{ item['name'] }}"
+    state: "{{ item['state'] | d('started') }}"
+    enabled: "{{ item['enabled'] }}"
+  loop: "{{ k8s_services_list }}"
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - k8s
+    - k8s-centos-install

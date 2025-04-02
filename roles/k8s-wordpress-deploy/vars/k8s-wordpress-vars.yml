@@ -1,0 +1,27 @@
+# Переменные депллоя Wordpress
+---
+k8s_wordpress_hostdir: "/mnt/gluster/wordpress"
+
+k8s_wordpress_manifests_dir: "/opt/manifests/wordpress"
+
+k8s_wordpress_container_config:
+  name: "wordpress"
+  image: "192.168.0.1:5000/my_word"
+  tag: '6.7'
+
+k8s_wordpress_cfg:
+  name: "wordpress"
+  namespase: "wordpress"
+  secret_name: "wordpress-secrets"
+  port: '80'
+  deploy_name: "wordpress"
+  replicas: '2'
+  protocol: "TCP"
+  service_type: "ClusterIP"
+  storage_name: "wordpress-storage"
+  db_host: "mysql-service"
+
+# k8s_wordpress_manifests:
+#   - wordpress-secrets.yaml
+#   - wordpress-deploy.yaml
+#   - wordpress-service.yaml

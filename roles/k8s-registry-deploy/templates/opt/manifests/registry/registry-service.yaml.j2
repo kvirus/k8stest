@@ -1,0 +1,15 @@
+{#Сервис для Registry#}
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "{{ k8s_registry_config['service_name'] }}"
+  namespace: "{{ k8s_registry_config['namespase'] }}"
+spec:
+  type: "{{ k8s_registry_config['service_type'] }}"
+  selector:
+    app: "{{ k8s_registry_config['service_name'] }}"
+  ports:
+    - protocol: "{{ k8s_registry_config['protocol'] }}"
+      port: "{{ k8s_registry_config['container_port'] }}"
+      targetPort: "{{ k8s_registry_config['target_port'] }}"

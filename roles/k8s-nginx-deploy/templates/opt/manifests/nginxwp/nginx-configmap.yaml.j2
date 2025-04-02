@@ -1,0 +1,113 @@
+{#Конфиг для Nginx для доступа к wordpress#}
+---
+apiVersion: "v1"
+kind: "ConfigMap"
+metadata:
+  name: "{{ k8s_nginx_wp_deploy_cfg['configmap_name'] }}"
+  namespace: "{{ k8s_nginx_wp_deploy_cfg['namespase'] }}"
+data:
+  nginx.conf: |
+    user  nginx;
+    worker_processes  auto;
+
+    error_log  /var/log/nginx/error.log notice;
+    pid        /var/run/nginx.pid;
+    include /etc/nginx/modules-enabled/*.conf;
+
+    events {
+        worker_connections  1024;
+    }
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+
+        log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                        '$status $body_bytes_sent "$http_referer" '
+                        '"$http_user_agent" "$http_x_forwarded_for"';
+
+        access_log  /var/log/nginx/access.log  main;
+
+        sendfile        on;
+        #tcp_nopush     on;
+
+        keepalive_timeout  65;
+
+        #gzip  on;
+
+        include /etc/nginx/conf.d/*.conf;
+
+        include /etc/nginx/upstreams/*.conf;
+
+        include /etc/nginx/sites-available/*;
+    }
+  wordpress.conf: |
+    upstream wordpress_local {
+        server 192.168.0.2;
+        server 192.168.0.3;
+    }
+  registry.conf: |
+    upstream registry_upstream {
+        server 192.168.0.3:5000;
+    }
+  wordpress.local.conf: |
+    server {
+    listen 443 ssl;
+    http2 on;
+    server_name wordpress.local www.wordpress.local;
+
+    ssl_certificate /etc/nginx/ssl/wordpress/server.crt;
+    ssl_certificate_key /etc/nginx/ssl/wordpress/server.key;
+
+    location = /robots.txt {
+        allow all;
+        log_not_found off;
+        access_log off;
+    }
+
+    location / {
+        proxy_pass http://wordpress_local;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header SSL_PROTOCOL $ssl_protocol;
+    }
+    }
+  registry.local.conf: |
+    server {
+        listen 443 ssl;
+        http2 on;
+        server_name registry;
+
+        ssl_certificate /etc/nginx/ssl/registry/server.crt;
+        ssl_certificate_key /etc/nginx/ssl/registry/server.key;
+
+        location / {
+            proxy_pass http://registry_upstream;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+    }
+  default.conf: |
+    server {
+    listen 443 ssl;
+    server_name _;
+
+    ssl_certificate /etc/nginx/ssl/server.crt;
+    ssl_certificate_key /etc/nginx/ssl/server.key;
+
+    location / {
+        add_header Content-Type text/html;
+        return 200 '<html><head><title>200 OK</title></head><body><h1>200 OK</h1><p>This is 200!</p></body></html>';
+    }
+
+    location /image/ {
+        root /usr/share/nginx/html;
+    }
+
+    #access_log  /var/log/nginx/host.access.log  main;
+
+    }
+
+

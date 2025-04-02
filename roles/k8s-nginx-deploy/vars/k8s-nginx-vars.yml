@@ -1,0 +1,28 @@
+# Переменные для Nginx
+---
+k8s_nginx_deploy_manifests_dir: "/opt/manifests/nginxwp"
+
+# k8s_nginx_deploy_manifests: # НУЖНО ЛИ ??????
+#   - nginx-configmap.yaml
+#   - nginx-deploy.yaml
+#   - nginx-service.yaml
+
+k8s_nginx_deploy_config:
+  name: "nginx"
+  image: "192.168.0.1:5000/my_nginx"
+  tag: '1.27.4'
+
+k8s_nginx_deploy_cfg:
+  name: "nginx"
+  namespase: "wordpress"
+  deploy_number: '1'
+  config_name: "nginx-config"
+  configmap_name: "nginx-config"
+  nodeport: '30080' # ?????
+  service_type: "NodePort"
+  service_name: "nginxwp"
+  protocol: "TCP"
+  targetPort: '80' # 443 ?!
+  deploy_port: '80' # 443 ?!
+  nginx_node: "front"
+  secret_file_name: "nginx-ssl"

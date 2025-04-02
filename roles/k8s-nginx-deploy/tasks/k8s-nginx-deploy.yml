@@ -1,0 +1,51 @@
+# Nginx для доступа к wordpress
+---
+- name: "Создание директории для манифестов"
+  file:
+    path: "{{ item['path'] }}"
+    mode: "{{ item['mode'] | d('0744') }}"
+    state: "directory"
+    recurse: true
+  loop:
+    - { path: "{{ k8s_nginx_deploy_manifests_dir }}" }
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s-nginx-deploy
+
+- name: "Создание Namespace"
+  kubernetes.core.k8s:
+    name: "{{ k8s_nginx_deploy_deploy_cfg['namespase'] }}"
+    api_version: "v1"
+    kind: "Namespace"
+    state: present
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s-nginx-deploy
+
+- name: "Перенос манифестов на мастер ноду"
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "opt/manifests/nginxwp/nginx-configmap.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-configmap.yaml"}
+    - { src: "opt/manifests/nginxwp/nginx-deploy.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-deploy.yaml"}
+    - { src: "opt/manifests/nginxwp/nginx-service.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-service.yaml"}
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s-nginx-deploy
+
+- name: "Деплой манифестов Nginx"
+  kubernetes.core.k8s:
+    src: "{{ item['item'] }}"
+    state: present
+  loop: "{{ lookup('fileglob', k8s_nginx_deploy_manifests_dir + '/*.yaml', wantlist=true) }}"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s-nginx-deploy

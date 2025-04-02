@@ -1,0 +1,87 @@
+# Инициализация кластера Kubernetes
+---
+- name: "Инициализируем кластер Kubernetes"
+  command: "kubeadm init --pod-network-cidr={{ k8s_config['pod_network'] }}"
+  args:
+    creates: "{{ k8s_config['cfg_file'] }}"
+  when:
+    - inventory_hostname in groups 'k8s-master'
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s
+    - k8s-cluster-init
+
+- name: "Создание директории для конфига пользователю Master"
+  file:
+    path: "{{ item['path'] }}"
+    mode: "{{ item['mode'] | d('0744') }}"
+    state: "directory"
+  loop:
+    - { path: "{{ k8s_config['config_dir'] }}" }
+  when:
+    - inventory_hostname in groups 'k8s-master'
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s
+    - k8s-cluster-init
+
+- name: "Копирование конфигурации кластера пользователю Master"
+  copy:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    mode: "{{ item['mode'] | d('0600') }}"
+    remote_src: true
+  loop:
+    - { src: "{{ k8s_config['cfg_file'] }}", dest: "{{ k8s_config['copy_config_dir'] }}" }
+  when:
+    - inventory_hostname in groups 'k8s-master'
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s
+    - k8s-cluster-init
+
+- name: "Установка сетевого адаптера Flannel"
+  k8s:
+    definition: "{{ lookup('url', k8s_config['network_url']) }}"
+    state: present
+  when:
+    - inventory_hostname in groups 'k8s-master'
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s
+    - k8s-cluster-init
+
+- name: "Получаем команду присоединения к кластеру"
+  command: "{{ k8s_config['connect_str'] }}"
+  register: k8s_join
+  when:
+    - inventory_hostname in groups 'k8s-master'
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s
+    - k8s-cluster-init
+
+- name: "Сохраняем команду присоединения к кластеру"
+  set_fact:
+    k8s_join_command: "{{ k8s_join.stdout }}"
+  tags:
+    - k8s
+    - k8s-cluster-init
+
+- name: "Присоединение воркеров к кластеру"
+  command: "{{ k8s_join_command }}"
+  when:
+    - k8s_join_command is defined
+    - inventory_hostname in groups 'workers'
+  tags:
+    - k8s
+    - k8s-cluster-init
+
+- name: "Установка лейблов для нод"
+  command: "kubectl label node {{ item['name'] }} role={{ item['role'] }}"
+  loop: "{{ k8s_worker_label }}"
+  when:
+    - inventory_hostname in groups 'workers'
+  tags:
+    - k8s
+    - k8s-cluster-init

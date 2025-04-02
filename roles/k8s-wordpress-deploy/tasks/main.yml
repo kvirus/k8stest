@@ -1,0 +1,4 @@
+# Импорт кастомных задач
+---
+- import_tasks: 'k8s-wordpress-deploy-vars.yml'
+- import_tasks: 'k8s-wordpress-deploy.yml'

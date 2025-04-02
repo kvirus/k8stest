@@ -1,0 +1,51 @@
+# Установка компонентов на Ubuntu
+---
+- name: "Добавление gpg ключа Kubernetes"
+  apt_key:
+    url: "{{ item['url'] }}"
+    state: "{{ item['state'] | d('present') }}"
+    keyring: "{{ item['keyring'] }}"
+  loop:
+    - "{{ k8s_ubuntu_gpg_cfg }}"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s
+    - k8s-ubuntu-install
+
+- name: "Добавление репозитория Kubernetes"
+  apt_repository:
+    repo: "{{ item['repo'] }}"
+    state: "{{ item['state'] | d('present') }}"
+    filename: "{{ item['filename'] }}"
+    update_cache: true
+  loop:
+    - "{{ k8s_ubuntu_repo }}"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s
+    - k8s-ubuntu-install
+
+- name: "Установка пакетов k8s"
+  apt:
+    name: "{{ k8s_install_pkgs }}"
+    cache_valid_time: "{{ k8s_cache_valid_time }}"
+    state: present
+    update_cache: true
+  notify: k8s-clean-handler
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s
+    - k8s-ubuntu-install
+
+- name: "Установка hold на пакеты"
+  dpkg_selections:
+    name: "{{ k8s_install_pkgs[:-1] | list }}"
+    selection: "hold"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s
+    - k8s-ubuntu-install

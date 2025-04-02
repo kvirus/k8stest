@@ -1,0 +1,4 @@
+# Импорт задач
+---
+- import_tasks: 'k8s-mysql-deploy-vars.yml'
+- import_tasks: 'k8s-mysql-deploy.yml'

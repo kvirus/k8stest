@@ -1,0 +1,63 @@
+# Деплой  Mysql как StatefulSet
+---
+- name: "Создание директории для манифеста и БД"
+  file:
+    path: "{{ item['path'] }}"
+    mode: "{{ item['mode'] | d('0744') }}"
+    state: "directory"
+  loop:
+    - { path: "{{ k8s_mysql_deploy_manifests_dir }}" }
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s-mysql-deploy
+
+- name: "Создание директории для хранения БД"
+  file:
+    path: "{{ item['path'] }}"
+    mode: "{{ item['mode'] | d('0744') }}"
+    state: "directory"
+  loop:
+    - { path: "{{ k8s_mysql_deploy_db_dir }}" }
+  delegate_to: "{{ groups['workers'][1] }}"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s-mysql-deploy
+
+- name: "Перенос манифестов на мастер ноду"
+  ansible.builtin.template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "opt/manifests/mysql/mysql-secrets.yaml.j2", dest: "{{ k8s_mysql_deploy_manifests_dir }}/mysql-secrets.yaml"}
+    - { src: "opt/manifests/mysql/mysql-deploy.yaml.j2", dest: "{{ k8s_mysql_deploy_manifests_dir }}/mysql-deploy.yaml"}
+    - { src: "opt/manifests/mysql/mysql-service.yaml.j2", dest: "{{ k8s_mysql_deploy_manifests_dir }}/mysql-service.yaml"}
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s-mysql-deploy
+
+- name: "Создание Namespace"
+  kubernetes.core.k8s:
+    name: "{{ k8s_mysql_deploy_deploy_cfg['namespase'] }}"
+    api_version: "v1"
+    kind: "Namespace"
+    state: present
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s-mysql-deploy
+
+- name: "Деплой манифестов для MySql"
+  kubernetes.core.k8s:
+    src: "{{ item }}"
+    state: present
+  loop: "{{ lookup('fileglob', k8s_mysql_deploy_manifests_dir + '/*.yaml', wantlist=true) }}"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s-mysql-deploy

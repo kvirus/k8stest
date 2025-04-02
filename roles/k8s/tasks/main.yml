@@ -1,0 +1,7 @@
+# Импорт задач
+---
+- import_tasks: 'k8s-import-vars.yml' # Импорт переменных
+- import_tasks: 'k8s-setup.yml' # Установка необходимых параметров для ОС
+- import_tasks: 'k8s-centos-install.yml' # Установка на ОС Centos
+- import_tasks: 'k8s-ubuntu-install.yml' # Установка на ОС Ubuntu
+- import_tasks: 'k8s-cluster-init.yml' # Инициализация кластера, подключение воркеров, установка лейблов

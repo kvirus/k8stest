@@ -1,0 +1,23 @@
+# Переменные для Registry deployment
+---
+k8s_registry_deploy_manifests_dir: "/opt/kubernetes/manifests/registry"
+
+# k8s_registry_deploy_manifests:
+#   - registry-deploy.yaml
+#   - registry-service.yaml
+
+k8s_registry_deploy_container_config:
+  name: "registry"
+  image: "registry"
+  tag: '2'
+
+k8s_registry_deploy_config:
+  deploy_name: "docker-registry"
+  namespase: "wordpress"
+  service_name: "registry"
+  node: "back"
+  container_port: '5000'
+  target_port: '5000'
+  replicas: '1'
+  protocol: "TCP"
+  service_type: "ClusterIP"

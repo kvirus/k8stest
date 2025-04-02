@@ -1,0 +1,28 @@
+# Переменные деплоя Mysql
+---
+k8s_mysql_deploy_manifests_dir: "/opt/manifests/mysql"
+
+k8s_mysql_deploy_db_dir: "/mnt/gluster/mysql"
+
+k8s_mysql_deploy_deploy_cfg:
+  namespase: "wordpress"
+  secret: "mysql-secret"
+  deploy_name: "mysql"
+  secret_name: "mysql-secret"
+  node: "back"
+  service_name: "mysql-service"
+  service_type: "ClusterIP"
+  protocol: "TCP"
+  targetport: '3306'
+  port: '3306'
+  volume_name: "host-storage"
+
+k8s_mysql_deploy_container_config:
+  name: "mysql"
+  image: "192.168.0.1:5000/my_mysql"
+  tag: '9.2.0'
+
+# k8s_mysql_deploy_manifests:
+#   - mysql-secrets.yaml
+#   - mysql-deploy.yaml
+#   - mysql-service.yaml

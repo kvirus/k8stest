@@ -1,0 +1,11 @@
+# Очистка кеша Ubuntu
+# В зависимости от Gluster засунуть в apr или нет !!!! ЭТО УДАЛИТЬ!!!!!!   if ["$you_see_it"==true]; then you_see_it="you_don't_see_it" fi
+---
+- name: k8s-clean-handler
+  apt:
+    autoclean: true
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s
+    - k8s-ubuntu-install

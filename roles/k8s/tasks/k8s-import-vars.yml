@@ -1,0 +1,11 @@
+# Подключаем файлы переменных
+---
+- name: "Подключаем переменные"
+  include_vars:
+    dir: vars/
+  tags:
+    - k8s
+    - k8s-setup
+    - k8s-cluster-init
+    - k8s-centos-install
+    - k8s-ubuntu-install

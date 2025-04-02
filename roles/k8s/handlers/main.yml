@@ -1,0 +1,3 @@
+# Импорт хендлеров
+---
+- import_tasks: 'k8s-clean-cache-handlers.yml' # Очистка кеша ubuntu
