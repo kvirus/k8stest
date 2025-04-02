@@ -29,7 +29,7 @@
 
 - name: "Создание Namespace"
   kubernetes.core.k8s:
-    name: "{{ k8s_registry_deploy_config['namespase'] }}"
+    name: "{{ k8s_registry_deploy_config['namespace'] }}"
     api_version: "v1"
     kind: "Namespace"
     state: present
@@ -40,9 +40,9 @@
 
 - name: "Деплой манифестов docker-registry"
   kubernetes.core.k8s:
-    src: "{{ item }}"
+    src: "{{ k8s_registry_deploy_manifests_dir }}/{{ item }}"
     state: present
-  loop: "{{ lookup('fileglob', k8s_registry_deploy_manifests_dir + '/*.yaml', wantlist=true) }}"
+  loop: "{{ k8s_registry_deploy_manifests }}"
   when:
     - ansible_os_family == "Debian"
   tags:

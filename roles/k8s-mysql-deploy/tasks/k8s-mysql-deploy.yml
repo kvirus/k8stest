@@ -43,7 +43,7 @@
 
 - name: "Создание Namespace"
   kubernetes.core.k8s:
-    name: "{{ k8s_mysql_deploy_cfg['namespase'] }}"
+    name: "{{ k8s_mysql_deploy_cfg['namespace'] }}"
     api_version: "v1"
     kind: "Namespace"
     state: present
@@ -54,10 +54,10 @@
 
 - name: "Деплой манифестов для MySql"
   kubernetes.core.k8s:
-    src: "{{ item }}"
+    src: "{{ k8s_mysql_deploy_manifests_dir }}/{{ item }}"
     state: present
-  #loop: "{{ lookup('fileglob', k8s_mysql_deploy_manifests_dir + '/*.yaml', wantlist=true) }}"
   loop: "{{ k8s_mysql_deploy_manifests }}"
+  delegate_to: "{{ groups['k8s-master'][0] }}"
   when:
     - ansible_os_family == "Debian"
   tags:

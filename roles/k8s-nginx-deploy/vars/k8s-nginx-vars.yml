@@ -2,10 +2,10 @@
 ---
 k8s_nginx_deploy_manifests_dir: "/opt/manifests/nginxwp"
 
-# k8s_nginx_deploy_manifests: # НУЖНО ЛИ ??????
-#   - nginx-configmap.yaml
-#   - nginx-deploy.yaml
-#   - nginx-service.yaml
+k8s_nginx_deploy_manifests:
+  - nginx-configmap.yaml
+  - nginx-deploy.yaml
+  - nginx-service.yaml
 
 k8s_nginx_deploy_config:
   name: "nginx"
@@ -14,7 +14,7 @@ k8s_nginx_deploy_config:
 
 k8s_nginx_deploy_cfg:
   name: "nginx"
-  namespase: "wordpress"
+  namespace: "wordpress"
   deploy_number: '1'
   config_name: "nginx-config"
   configmap_name: "nginx-config"

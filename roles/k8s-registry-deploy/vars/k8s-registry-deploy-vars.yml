@@ -2,9 +2,9 @@
 ---
 k8s_registry_deploy_manifests_dir: "/opt/manifests/registry"
 
-# k8s_registry_deploy_manifests:
-#   - registry-deploy.yaml
-#   - registry-service.yaml
+k8s_registry_deploy_manifests:
+  - registry-deploy.yaml
+  - registry-service.yaml
 
 k8s_registry_deploy_container_config:
   name: "registry"
@@ -13,7 +13,7 @@ k8s_registry_deploy_container_config:
 
 k8s_registry_deploy_config:
   deploy_name: "docker-registry"
-  namespase: "wordpress"
+  namespace: "wordpress"
   service_name: "registry"
   node: "back"
   container_port: '5000'

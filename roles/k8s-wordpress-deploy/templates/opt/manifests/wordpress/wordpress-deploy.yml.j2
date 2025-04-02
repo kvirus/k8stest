@@ -4,7 +4,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: "{{ k8s_wordpress_cfg['name'] }}"
-  namespace: "{{ k8s_wordpress_cfg['namespase'] }}"
+  namespace: "{{ k8s_wordpress_cfg['namespace'] }}"
 spec:
   replicas: "{{ k8s_wordpress_cfg['replicas'] }}"
   selector:

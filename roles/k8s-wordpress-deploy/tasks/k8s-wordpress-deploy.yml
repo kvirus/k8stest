@@ -42,7 +42,7 @@
 
 - name: "Создание Namespace"
   kubernetes.core.k8s:
-    name: "{{ k8s_wordpress_cfg['namespase'] }}"
+    name: "{{ k8s_wordpress_cfg['namespace'] }}"
     api_version: "v1"
     kind: "Namespace"
     state: present
@@ -68,9 +68,9 @@
 
 - name: "Деплой манифестов Nginx"
   kubernetes.core.k8s:
-    src: "{{ item }}"
+    src: "{{ k8s_wordpress_manifests_dir }}/{{ item }}"
     state: present
-  loop: "{{ lookup('fileglob', k8s_wordpress_manifests_dir + '/*.yaml', wantlist=true) }}"
+  loop: "{{ k8s_wordpress_manifests }}"
   when:
     - ansible_os_family == "Debian"
   tags:

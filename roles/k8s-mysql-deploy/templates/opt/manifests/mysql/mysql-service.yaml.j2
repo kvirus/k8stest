@@ -4,12 +4,12 @@ apiVersion: "v1"
 kind: "Service"
 metadata:
   name: "{{ k8s_mysql_deploy_cfg['service_name'] }}"
-  namespace: "{{ k8s_mysql_deploy_cfg['namespase'] }}"
+  namespace: "{{ k8s_mysql_deploy_cfg['namespace'] }}"
 spec:
   selector:
     app: "{{ k8s_mysql_deploy_cfg['service_name'] }}"
   type: "{{ k8s_mysql_deploy_cfg['service_type'] }}"
   ports:
     - protocol: "{{ k8s_mysql_deploy_cfg['protocol'] }}"
-      port: "{{ k8s_mysql_deploy_cfg['port'] }}"
-      targetPort: "{{ k8s_mysql_deploy_cfg['targetport'] }}"
+      port: {{ k8s_mysql_deploy_cfg['port'] }}
+      targetPort: {{ k8s_mysql_deploy_cfg['targetport'] }}
