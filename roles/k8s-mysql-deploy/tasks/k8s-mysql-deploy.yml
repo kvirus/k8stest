@@ -43,7 +43,7 @@
 
 - name: "Создание Namespace"
   kubernetes.core.k8s:
-    name: "{{ k8s_mysql_deploy_deploy_cfg['namespase'] }}"
+    name: "{{ k8s_mysql_deploy_cfg['namespase'] }}"
     api_version: "v1"
     kind: "Namespace"
     state: present

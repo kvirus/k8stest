@@ -1,6 +1,6 @@
 # Переменные для Registry deployment
 ---
-k8s_registry_deploy_manifests_dir: "/opt/kubernetes/manifests/registry"
+k8s_registry_deploy_manifests_dir: "/opt/manifests/registry"
 
 # k8s_registry_deploy_manifests:
 #   - registry-deploy.yaml

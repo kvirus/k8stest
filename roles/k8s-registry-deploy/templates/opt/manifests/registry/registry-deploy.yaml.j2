@@ -3,23 +3,23 @@
 apiVersion: apps/v1
 kind: "StatefulSet"
 metadata:
-  name: "{{ k8s_registry_config['deploy_name'] }}"
-  namespace: "{{ k8s_registry_config['namespase'] }}"
+  name: "{{ k8s_registry_deploy_config['deploy_name'] }}"
+  namespace: "{{ k8s_registry_deploy_config['namespase'] }}"
 spec:
-  serviceName: "{{ k8s_registry_config['deploy_name'] }}"
-  replicas: "{{ k8s_registry_config['replicas'] }}"
+  serviceName: "{{ k8s_registry_deploy_config['deploy_name'] }}"
+  replicas: "{{ k8s_registry_deploy_config['replicas'] }}"
   selector:
     matchLabels:
-      app: "{{ k8s_registry_config['deploy_name'] }}"
+      app: "{{ k8s_registry_deploy_config['deploy_name'] }}"
   template:
     metadata:
       labels:
-        app: "{{ k8s_registry_config['deploy_name'] }}"
+        app: "{{ k8s_registry_deploy_config['deploy_name'] }}"
     spec:
       containers:
         - name: "{{ k8s_registry_container_config['name'] }}"
           image: "{{ k8s_registry_container_config['image'] }}:{{ k8s_registry_container_config['tag'] }}"
           ports:
-            - containerPort: "{{ k8s_registry_config['container_port'] }}"
+            - containerPort: "{{ k8s_registry_deploy_config['container_port'] }}"
       nodeSelector:
-        role: {{ k8s_registry_config['node'] }}
+        role: {{ k8s_registry_deploy_config['node'] }}

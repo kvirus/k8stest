@@ -4,7 +4,7 @@ k8s_mysql_deploy_manifests_dir: "/opt/manifests/mysql"
 
 k8s_mysql_deploy_db_dir: "/mnt/gluster/mysql"
 
-k8s_mysql_deploy_deploy_cfg:
+k8s_mysql_deploy_cfg:
   namespase: "wordpress"
   secret: "mysql-secret"
   deploy_name: "mysql"

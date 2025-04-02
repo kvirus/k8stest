@@ -1,4 +1,4 @@
 # Импорт кастомных задач
 ---
 - import_tasks: 'k8s-nginx-deploy-vars.yml'
-- import_tasks: 'k8s-nginx-deploy-deploy.yml'
+- import_tasks: 'k8s-nginx-deploy.yml'

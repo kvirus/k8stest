@@ -19,8 +19,8 @@ spec:
       nodeSelector:
         kubernetes.io/hostname: "{{ k8s_mysql_deploy_cfg['node'] }}"  {#Название ноды тут#}
       containers:
-        - name: "{{ k8s_mysql_container_config['name'] }}"
-          image: "{{ k8s_mysql_container_config['image'] }}:{{ k8s_mysql_container_config['tag'] }}"
+        - name: "{{ k8s_mysql_deploy_container_config['name'] }}"
+          image: "{{ k8s_mysql_deploy_container_config['image'] }}:{{ k8s_mysql_deploy_container_config['tag'] }}"
           env:
             - name: "MYSQL_ROOT_PASSWORD"
               valueFrom:
@@ -50,5 +50,5 @@ spec:
       volumes:
         - name: "{{ k8s_mysql_deploy_cfg['volume_name'] }}"
           hostPath:
-            path: {{ k8s_mysql_db_dir }}  {#Путь на хосте, который нужно примонтировать#}
+            path: {{ k8s_mysql_deploy_db_dir }}  {#Путь на хосте, который нужно примонтировать#}
             type: Directory
