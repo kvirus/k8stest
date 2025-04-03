@@ -46,7 +46,7 @@
   loop:
     - { src: "opt/manifests/wordpress/wordpress-deploy.yaml.j2", dest: "{{ k8s_wordpress_manifests_dir }}/wordpress-deploy.yaml"}
     - { src: "opt/manifests/wordpress/wordpress-secrets.yaml.j2", dest: "{{ k8s_wordpress_manifests_dir }}/wordpress-secrets.yaml"}
-    - - { src: "opt/manifests/wordpress/wordpress-deploy-service.yaml.j2", dest: "{{ k8s_wordpress_manifests_dir }}/wordpress-deploy-service.yaml"}
+    - { src: "opt/manifests/wordpress/wordpress-deploy-service.yaml.j2", dest: "{{ k8s_wordpress_manifests_dir }}/wordpress-deploy-service.yaml"}
   when:
     - ansible_os_family == "Debian"
   tags:

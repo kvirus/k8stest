@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: "{{ k8s_wordpress_container_config['name'] }}"
-          image: "{{ k8s_wordpress_container_config['image'] }}":"{{ k8s_wordpress_container_config['tag'] }}"
+          image: {{ k8s_wordpress_container_config['image'] }}:{{ k8s_wordpress_container_config['tag'] }}
           env:
             - name: WORDPRESS_DB_HOST
               value: "{{ k8s_wordpress_cfg['db_host'] }}"
@@ -37,10 +37,10 @@ spec:
                   name: "{{ k8s_wordpress_cfg['secret_name'] }}"
                   key: "MYSQL_PASSWORD"
           ports:
-            - containerPort: "{{ k8s_wordpress_cfg['port'] }}"
+            - containerPort: {{ k8s_wordpress_cfg['port'] }}
           volumeMounts:
             - name: "{{ k8s_wordpress_cfg['storage_name'] }}"
-              mountPath: /var/www/html  {# Монтируем директорию статики WordPress #}
+              mountPath: /var/www/html
       volumes:
         - name: "{{ k8s_wordpress_cfg['storage_name'] }}"
           hostPath:

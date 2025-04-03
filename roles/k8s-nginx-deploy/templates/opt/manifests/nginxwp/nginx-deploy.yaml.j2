@@ -6,7 +6,7 @@ metadata:
   name: "{{ k8s_nginx_deploy_cfg['name'] }}"
   namespace: "{{ k8s_nginx_deploy_cfg['namespace'] }}"
 spec:
-  replicas: "{{ k8s_nginx_deploy_cfg['replicas'] }}"
+  replicas: {{ k8s_nginx_deploy_cfg['replicas'] }}
   selector:
     matchLabels:
       app: "{{ k8s_nginx_deploy_cfg['name'] }}"
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: "{{ k8s_nginx_deploy_config['name'] }}"
-          image: "{{ k8s_nginx_deploy_config['image'] }}:{{ k8s_nginx_deploy_config['tag'] }}"
+          image: {{ k8s_nginx_deploy_config['image'] }}:{{ k8s_nginx_deploy_config['tag'] }}
           ports:
             - containerPort: {{ k8s_nginx_deploy_cfg['deploy_port'] }}
           volumeMounts:
@@ -39,9 +39,14 @@ spec:
             - name: "{{ k8s_nginx_deploy_cfg['config_name'] }}"
               mountPath: /etc/nginx/conf.d/default.conf
               subPath: default.conf
+            - name: "{{ k8s_nginx_deploy_cfg['secret_name'] }}"
+              mountPath: "/etc/nginx/ssl"
       volumes:
         - name: "{{ k8s_nginx_deploy_cfg['config_name'] }}"
           configMap:
             name: "{{ k8s_nginx_deploy_cfg['configmap_name'] }}"
+        - name: "{{ k8s_nginx_deploy_cfg['secret_name'] }}"
+          secret:
+            secretName: "{{ k8s_nginx_deploy_cfg['secret_file_name'] }}"
       nodeSelector:
         role: {{ k8s_nginx_deploy_cfg['nginx_node'] }}
