@@ -19,7 +19,7 @@ k8s_wordpress_cfg:
   port: '80'
   targetport: '80'
   deploy_name: "wordpress"
-  replicas: '2'
+  replicas: '1' # ТЕСТ ИСПРАВИТЬ на 2!!!!
   protocol: "TCP"
   service_type: "ClusterIP"
   storage_name: "wordpress-storage"
@@ -31,3 +31,4 @@ k8s_wordpress_manifests:
   - wordpress-secrets.yaml
   - wordpress-deploy.yaml
   - wordpress-deploy-service.yaml
+  - wordpress-deploy-configmap.yaml
