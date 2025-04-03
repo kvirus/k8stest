@@ -8,7 +8,7 @@ metadata:
 spec:
   type: "{{ k8s_wordpress_cfg['service_type'] }}"
   selector:
-    app: "{{ k8s_wordpress_cfg['service_name'] }}"
+    app: "{{ k8s_wordpress_cfg['name'] }}"
   ports:
     - protocol: "{{ k8s_wordpress_cfg['protocol'] }}"
       port: {{ k8s_wordpress_cfg['port'] }}

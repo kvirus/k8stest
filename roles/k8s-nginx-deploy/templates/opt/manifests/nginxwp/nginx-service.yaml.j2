@@ -8,7 +8,7 @@ metadata:
 spec:
   type: "{{ k8s_nginx_deploy_cfg['service_type'] }}"
   selector:
-    app: "{{ k8s_nginx_deploy_cfg['service_name'] }}"
+    app: "{{ k8s_nginx_deploy_cfg['name'] }}"
   ports:
     - protocol: "{{ k8s_nginx_deploy_cfg['protocol'] }}"
       port: {{ k8s_nginx_deploy_cfg['deploy_port'] }}

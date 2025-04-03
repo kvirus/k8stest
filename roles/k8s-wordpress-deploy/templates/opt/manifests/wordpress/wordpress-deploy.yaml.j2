@@ -41,8 +41,15 @@ spec:
           volumeMounts:
             - name: "{{ k8s_wordpress_cfg['storage_name'] }}"
               mountPath: /var/www/html
+            - name: "{{ k8s_wordpress_cfg['config_name'] }}"
+              mountPath: "/var/www/html/wp-config.php"
+              subPath: "wp-config.php"
       volumes:
         - name: "{{ k8s_wordpress_cfg['storage_name'] }}"
           hostPath:
-            path: "{{ k8s_wordpress_hostdir }}"  # Путь на хосте
-            type: DirectoryOrCreate      # Если директория не существует, она будет создана
+            path: "{{ k8s_wordpress_hostdir }}"
+            type: DirectoryOrCreate
+        - name: "{{ k8s_wordpress_cfg['config_name'] }}"
+          configMap:
+            name: "{{ k8s_wordpress_cfg['configmap_name'] }}"
+

@@ -1,13 +1,13 @@
 {# Деплой Mysql как StatefulSet #}
 ---
-apiVersion: apps/v1
+apiVersion: "apps/v1"
 kind: "StatefulSet"
 metadata:
   name: "{{ k8s_mysql_deploy_cfg['deploy_name'] }}"
   namespace: "{{ k8s_mysql_deploy_cfg['namespace'] }}"
 spec:
   serviceName: "{{ k8s_mysql_deploy_cfg['deploy_name'] }}"
-  replicas: 1
+  replicas: {{ k8s_mysql_deploy_cfg['replicas'] }}
   selector:
     matchLabels:
       app: "{{ k8s_mysql_deploy_cfg['deploy_name'] }}"
@@ -16,8 +16,6 @@ spec:
       labels:
         app: "{{ k8s_mysql_deploy_cfg['deploy_name'] }}"
     spec:
-      nodeSelector:
-        kubernetes.io/hostname: "{{ k8s_mysql_deploy_cfg['node'] }}"
       containers:
         - name: "{{ k8s_mysql_deploy_container_config['name'] }}"
           image: "{{ k8s_mysql_deploy_container_config['image'] }}:{{ k8s_mysql_deploy_container_config['tag'] }}"
@@ -50,5 +48,7 @@ spec:
       volumes:
         - name: "{{ k8s_mysql_deploy_cfg['volume_name'] }}"
           hostPath:
-            path: {{ k8s_mysql_deploy_db_dir }}
-            type: Directory
+            path: "{{ k8s_mysql_deploy_db_dir }}"
+            type: "Directory"
+      {# nodeSelector:
+        kubernetes.io/hostname: "{{ k8s_mysql_deploy_cfg['node'] }}" #}

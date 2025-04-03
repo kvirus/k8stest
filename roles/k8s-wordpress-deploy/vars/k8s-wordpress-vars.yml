@@ -4,9 +4,11 @@ k8s_wordpress_hostdir: "/mnt/gluster/wordpress"
 
 k8s_wordpress_manifests_dir: "/opt/manifests/wordpress"
 
+k8s_wordpress_deploy_mysql_service: "mysql-service"
+
 k8s_wordpress_container_config:
   name: "wordpress"
-  image: "192.168.0.1:5000/my_word"
+  image: "wordpress"
   tag: '6.7'
 
 k8s_wordpress_cfg:
@@ -22,6 +24,8 @@ k8s_wordpress_cfg:
   service_type: "ClusterIP"
   storage_name: "wordpress-storage"
   db_host: "mysql-service"
+  configmap_name: "wp-config"
+  config_name: "wps-conf"
 
 k8s_wordpress_manifests:
   - wordpress-secrets.yaml

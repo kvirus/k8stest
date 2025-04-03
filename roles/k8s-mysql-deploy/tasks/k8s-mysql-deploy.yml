@@ -4,6 +4,8 @@
   file:
     path: "{{ item['path'] }}"
     mode: "{{ item['mode'] | d('0744') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
     state: "directory"
   loop:
     - { path: "{{ k8s_mysql_deploy_manifests_dir }}" }
@@ -16,6 +18,8 @@
   file:
     path: "{{ item['path'] }}"
     mode: "{{ item['mode'] | d('0744') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
     state: "directory"
   loop:
     - { path: "{{ k8s_mysql_deploy_db_dir }}" }

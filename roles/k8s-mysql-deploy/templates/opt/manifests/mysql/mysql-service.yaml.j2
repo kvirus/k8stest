@@ -7,7 +7,7 @@ metadata:
   namespace: "{{ k8s_mysql_deploy_cfg['namespace'] }}"
 spec:
   selector:
-    app: "{{ k8s_mysql_deploy_cfg['service_name'] }}"
+    app: "{{ k8s_mysql_deploy_cfg['deploy_name'] }}"
   type: "{{ k8s_mysql_deploy_cfg['service_type'] }}"
   ports:
     - protocol: "{{ k8s_mysql_deploy_cfg['protocol'] }}"

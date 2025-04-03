@@ -21,3 +21,9 @@ mysql-service.yaml - Создание сервиса для подключени
 ```
 
 
+!!!!!!!!!
+Сертификаты для registry кладем в (именно CA)
+/etc/docker/certs.d/registry/ca.crt
+так же занести в /ets/hosts
+ip_k8s_master registry
+рестарт сервиса docker

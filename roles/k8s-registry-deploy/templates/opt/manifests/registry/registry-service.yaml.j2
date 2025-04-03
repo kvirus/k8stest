@@ -8,7 +8,7 @@ metadata:
 spec:
   type: "{{ k8s_registry_deploy_config['service_type'] }}"
   selector:
-    app: "{{ k8s_registry_deploy_config['service_name'] }}"
+    app: "{{ k8s_registry_deploy_config['deploy_name'] }}"
   ports:
     - protocol: "{{ k8s_registry_deploy_config['protocol'] }}"
       port: {{ k8s_registry_deploy_config['container_port'] }}
