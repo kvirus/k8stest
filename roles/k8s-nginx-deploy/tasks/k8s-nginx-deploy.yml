@@ -35,6 +35,7 @@
     - { src: "opt/manifests/nginxwp/nginx-configmap.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-configmap.yaml"}
     - { src: "opt/manifests/nginxwp/nginx-deploy.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-deploy.yaml"}
     - { src: "opt/manifests/nginxwp/nginx-service.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-service.yaml"}
+    - { src: "opt/manifests/nginxwp/nginx-secret.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-secret.yaml"}
   when:
     - ansible_os_family == "Debian"
   tags:
