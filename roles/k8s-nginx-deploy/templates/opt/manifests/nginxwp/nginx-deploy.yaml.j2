@@ -48,5 +48,5 @@ spec:
         - name: "{{ k8s_nginx_deploy_cfg['secret_name'] }}"
           secret:
             secretName: "{{ k8s_nginx_deploy_cfg['secret_file_name'] }}"
-      nodeSelector:
-        role: "{{ k8s_nginx_deploy_cfg['nginx_node'] }}"
+      {# nodeSelector:
+        role: "{{ k8s_nginx_deploy_cfg['nginx_node'] }}" #}

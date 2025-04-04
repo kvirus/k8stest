@@ -29,6 +29,7 @@ k8s_wordpress_cfg:
 
 k8s_wordpress_manifests:
   - wordpress-secrets.yaml
+  - wordpress-deploy-configmap.yaml
   - wordpress-deploy.yaml
   - wordpress-deploy-service.yaml
-  - wordpress-deploy-configmap.yaml
+

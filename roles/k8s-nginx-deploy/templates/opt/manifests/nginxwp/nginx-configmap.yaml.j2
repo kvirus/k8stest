@@ -42,7 +42,7 @@ data:
     }
   wordpress.conf: |
     upstream wordpress_local {
-        server server wordpress-service:80;
+        server wordpress-service:80;
     }
   registry.conf: |
     upstream registry_upstream {
@@ -62,20 +62,14 @@ data:
         log_not_found off;
         access_log off;
     }
-    location /v2/ {
-      # Do not allow connections from docker 1.5 and earlier
-      # docker pre-1.6.0 did not properly set the user agent on ping, catch "Go *" user agents
-      if ($http_user_agent ~ "^(docker\/1\.(3|4|5(?!\.[0-9]-dev))|Go ).*$" ) {
-        return 404;
-    }
-    location / {
-        proxy_pass http://wordpress_local;
-        proxy_set_header Host $host;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        proxy_set_header SSL_PROTOCOL $ssl_protocol;
-    }
+      location / {
+          proxy_pass http://wordpress_local;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          proxy_set_header SSL_PROTOCOL $ssl_protocol;
+      }
     }
   registry.local.conf: |
     server {
@@ -107,16 +101,9 @@ data:
     listen 443 ssl;
     server_name _;
 
-    ssl_certificate /etc/nginx/ssl/registry.crt;
-    ssl_certificate_key /etc/nginx/ssl/registry.key;
-
     location / {
         add_header Content-Type text/html;
         return 200 '<html><head><title>200 OK</title></head><body><h1>200 OK</h1><p>This is 200!</p></body></html>';
-    }
-
-    location /image/ {
-        root /usr/share/nginx/html;
     }
 
     #access_log  /var/log/nginx/host.access.log  main;

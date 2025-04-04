@@ -5,6 +5,7 @@ k8s_nginx_deploy_manifests_dir: "/opt/manifests/nginxwp"
 k8s_nginx_deploy_manifests:
   - nginx-configmap.yaml
   - nginx-secret.yaml
+  - nginx-wordpress-ingress.yaml
   - nginx-deploy.yaml
   - nginx-service.yaml
 
@@ -29,3 +30,4 @@ k8s_nginx_deploy_cfg:
   nginx_node: "front"
   secret_file_name: "nginx-ssl"
   secret_name: "nginx-certs"
+  wp_ingress_name: "wordpress-ingress"

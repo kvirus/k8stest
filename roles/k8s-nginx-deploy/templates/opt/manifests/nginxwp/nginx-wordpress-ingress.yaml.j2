@@ -1,0 +1,21 @@
+---
+apiVersion: "networking.k8s.io/v1"
+kind: "Ingress"
+metadata:
+  name: "{{ k8s_wordpress_cfg['ingress_name'] }}"
+  namespace: default
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: "wordpress.local"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: "{{ k8s_wordpress_cfg['service_name'] }}"
+            port:
+              number: 80

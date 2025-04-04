@@ -3,7 +3,7 @@
 apiVersion: "v1"
 kind: "ConfigMap"
 metadata:
-  name: ""{{ k8s_wordpress_cfg['configmap_name'] }}""
+  name: "{{ k8s_wordpress_cfg['configmap_name'] }}"
   namespace: "{{ k8s_wordpress_cfg['namespace'] }}"
 data:
   wp-config.php: |
