@@ -1,0 +1,4 @@
+# Импорт задач
+---
+- import_tasks: 'registry-include-vars.yml'
+- import_tasks: 'registry.yml'

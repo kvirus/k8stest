@@ -1,0 +1,78 @@
+# Установка Docker на Ubuntu
+---
+- name: "Добавление GPG-ключа Docker"
+  apt_key:
+    url: "{{ docker_ubuntu_gpgkey }}"
+    state: present
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - docker
+    - docker-ubuntu-install
+
+- name: "Добавить репозиторий Docker"
+  apt_repository:
+    repo: "{{ item['repo'] }}"
+    state: "{{ item['state'] | d('present') }}"
+    filename: "{{ item['filename'] }}"
+    update_cache: true
+  loop:
+    - { repo: "{{ docker_ubuntu_repo }}", filename: "docker"}
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - docker
+    - docker-ubuntu-install
+
+- name: "Установка пакетов Ubuntu"
+  apt:
+    name: "{{ docker_unbuntu_install_pkgs }}"
+    state: present
+    update_cache: true
+    cache_valid_time: "{{ docker_cache_valid_time }}"
+  notify: docker-clean-handler
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - docker
+    - docker-ubuntu-install
+
+- name: "Копирование файла настройки registry"
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "etc/docker/daemon.json.j2", dest: "{{ docker_config_directory }}/daemon.json"}
+  notify: docker-restart
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - docker
+    - docker-ubuntu-install
+
+- name: "Запуск сервиса Docker"
+  service:
+    name: "{{ item['name'] }}"
+    state: "{{ item['state'] | d('started') }}"
+    enabled: "{{ item['enabled'] }}"
+  loop: "{{ docker_services_list }}"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - docker
+    - docker-ubuntu-install
+
+- name: "Добавляем пользователя Master в группу Docker"
+  user:
+    name: "{{ item['user'] }}"
+    groups: "{{ item['groups'] }}"
+    append: true
+  loop: "{{ docker_add_group }}"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - docker
+    - docker-centos-install

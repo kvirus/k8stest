@@ -1,0 +1,14 @@
+# Монтирование тома Gluster Volume
+---
+- name: "Монтируем Gluster Volume"
+  mount:
+    path: "{{ item['path'] }}"
+    src: "{{ item['src'] }}"
+    fstype: "{{ item['fstype'] | d('glusterfs') }}"
+    state: "{{ item['state'] | d('mounted') }}"
+    opts: "backup-volfile-servers={{ gluster_bricks[0] }}"
+  loop:
+    - { path: "{{ gluster_config['mount'] }}", src: "{{ gluster_bricks[1] }}:/{{ gluster_config['name'] }}"}
+  tags:
+    - gluster
+    - gluster-volume-mount

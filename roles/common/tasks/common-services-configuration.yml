@@ -1,0 +1,25 @@
+# Включение отключение необходимых служб в ОС
+---
+- name: "Включение/отключение служб (UBUNTU)"
+  systemd:
+    name: "{{ item['name'] }}"
+    state: "{{ item['state'] }}"
+    enabled: "{{ item['enabled'] }}"
+  loop: "{{ common_services_ubuntu }}"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - common
+    - common-configuration-services-ubuntu
+
+- name: "Включение/отключение служб (CENTOS)"
+  systemd:
+    name: "{{ item['name'] }}"
+    state: "{{ item['state'] }}"
+    enabled: "{{ item['enabled'] }}"
+  loop: "{{ common_services_centos }}"
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - common
+    - common-configuration-services-centos

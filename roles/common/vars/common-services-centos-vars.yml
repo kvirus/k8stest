@@ -1,0 +1,20 @@
+# Службы для запуска и остановки с ОС CentOS
+---
+common_services_centos:
+  - { name: "auditd.service", state: "started", enabled: true }
+  - { name: "chronyd.service", state: "started", enabled: true }
+  - { name: "dbus.service", state: "started", enabled: true }
+  - { name: "firewalld.service", state: "stopped", enabled: false }
+  - { name: "getty@tty1.service", state: "started", enabled: true }
+  - { name: "irqbalance.service", state: "started", enabled: true }
+  - { name: "lvm2-lvmetad.service", state: "started", enabled: true }
+  - { name: "NetworkManager.service", state: "started", enabled: true }
+  - { name: "polkit.service", state: "started", enabled: true }
+  - { name: "rsyslog.service", state: "started", enabled: true }
+  - { name: "sshd.service", state: "started", enabled: true }
+  - { name: "systemd-journald.service", state: "started", enabled: true }
+  - { name: "systemd-logind.service", state: "started", enabled: true }
+  - { name: "systemd-udevd.service", state: "started", enabled: true }
+  - { name: "tuned.service", state: "started", enabled: true }
+  - { name: "crond.service", state: "started", enabled: true }
+  - { name: "postfix.service", state: "stopped", enabled: false }

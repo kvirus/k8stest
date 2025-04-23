@@ -1,0 +1,4 @@
+# Импорт задач
+---
+- import_tasks: 'nginx-vars.yml' # Импорт переменных
+- import_tasks: 'nginx-deploy.yml' # Деплой Nginx

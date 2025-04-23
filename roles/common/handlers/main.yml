@@ -1,0 +1,4 @@
+# Импорт хендлеров
+---
+- import_tasks: 'common-ubuntu-cleancache-handlers.yml'
+- import_tasks: 'common-centos-cleancache-handlers.yml'

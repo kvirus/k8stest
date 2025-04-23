@@ -1,0 +1,13 @@
+# Переменные установки Gluster
+---
+gluster_centos_repo_cfg:
+  - repository: "http://mirror.yandex.ru/centos/centos/$releasever/storage/$basearch/gluster-9"
+    name: "centos-gluster9"
+    describe: "CentOS Gluster 9"
+    gpgkey: "file:///etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-Storage"
+
+gluster_pkgs_install:
+  - "glusterfs-server"
+
+  # Валидность кеша Ubuntu
+gluster_cache_valid_time: '86400'

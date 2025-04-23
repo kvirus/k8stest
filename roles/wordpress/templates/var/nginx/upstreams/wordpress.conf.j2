@@ -1,0 +1,3 @@
+upstream wordpress_local {
+    server "{{ wordpress_deploy_cfg['ip_gw'] }}:{{ wordpress_deploy_cfg['nodeport'] }}";
+}

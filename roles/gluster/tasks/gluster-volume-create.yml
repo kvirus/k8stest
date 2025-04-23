@@ -1,0 +1,45 @@
+# Создание Volume, подключение бриков
+---
+- name: "Создание директорий Gluster"
+  file:
+    path: "{{ item['path'] }}"
+    state: "directory"
+    mode: "{{ item['mode'] | d('0744') }}"
+  loop:
+    - { path: "{{ gluster_config['mount'] }}" }
+    - { path: "{{ gluster_config['brick_dir'] }}" }
+  tags:
+    - gluster
+    - gluster-brick-centos
+
+- name: "Подключение пиров в Gluster"
+  gluster_peer:
+    nodes: "{{ gluster_bricks }}"
+    state: present
+  run_once: true
+  when:
+    - inventory_hostname in groups['glarbitr']
+    - ansible_os_family == "Debian"
+  tags:
+    - gluster
+    - gluster-volume-create
+
+- name: "Создание и запуск Gluster Volume"
+  gluster_volume:
+    name: "{{ item['name'] }}"
+    replicas: "{{ item['replicas'] }}"
+    arbiters: "{{ item['arbiters'] }}"
+    state: "{{ item['state'] | d('present') }}"
+    bricks: "{{ item['brick_dir'] }}"
+    cluster: "{{ item['bricks'] }}"
+    force: true
+    start_on_create: true
+  run_once: true
+  loop:
+    - "{{ gluster_config }}"
+  when:
+    - inventory_hostname in groups['glarbitr']
+    - ansible_os_family == "Debian"
+  tags:
+    - gluster
+    - gluster-volume-create

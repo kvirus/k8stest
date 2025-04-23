@@ -1,0 +1,123 @@
+# Настройка Iptables
+---
+- name: "Включить IP-форвардинг"
+  sysctl:
+    name: "net.ipv4.ip_forward"
+    value: '1'
+    state: present
+    reload: true
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - firewall
+    - firewall-config
+
+- name: "Создание директории для правил и бекапа наших правил"
+  file:
+    path: "{{ item['path'] }}"
+    state: "directory"
+    mode: "{{ item['mode'] | d('0744') }}"
+  loop:
+    - { path: "{{ firewall_rules_directory }}" }
+    - { path: "{{ firewall_rules_directory }}/rules.old" }
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - firewall
+    - firewall-config
+
+- name: "Проверка существования файла правил (rules.txt)" # Если файл существовал то бекапим файл правил, перед копированием новых
+  stat:
+    path: "{{ firewall_rules_file }}"
+  register: rules_file
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - firewall
+    - firewall-config
+
+- name: "Резервное копирование прошлых правил наших правил rules.txt"
+  copy:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    remote_src: true
+  loop:
+    - { src: "{{ firewall_rules_file }}", dest: "{{ firewall_rules_directory }}/rules.old/rules_{{ ansible_date_time.date }}_{{ ansible_date_time.time | replace(':', '-') }}.txt" }
+  when:
+    - rules_file.stat.exists
+    - ansible_os_family == "Debian"
+  tags:
+    - firewall
+    - firewall-config
+
+- name: "Копирование новых правил и скрипта работы с iptables"
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "etc/firewall/rules.txt.j2", dest: "{{ firewall_rules_file }}"}
+    - { src: "usr/local/sbin/custom_firewall.sh.j2", dest: "{{ firewall_script_file }}", mode: "0744"}
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - firewall
+    - firewall-config
+
+- name: "Удаление старых правил и добавление новых"
+  command: "{{ firewall_script_file }} stop"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - firewall
+    - firewall-config
+
+- name: "Добавление новых правил"
+  command: "{{ firewall_script_file }} start"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - firewall
+    - firewall-config
+
+- name: "Проверяем существует ли файл rc.local"
+  stat:
+    path: "{{ item['path'] }}"
+  loop:
+    - { path: "/etc/rc.local" }
+  register: rc_local
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - firewall
+    - firewall-config
+
+- name: "Создаем /etc/rc.local, если его нет"
+  copy:
+    dest: "{{ item['path'] }}"
+    content: "{{ item['content'] }}"
+    mode: "{{ item['mode'] | d('0755') }}"
+  loop:
+    - { path: "/etc/rc.local", content: "#!/bin/bash\nexit 0" }
+  when:
+    - not rc_local.results[0].stat.exists
+    - ansible_os_family == "Debian"
+  tags:
+    - firewall
+    - firewall-config
+
+- name: "Добавить запуск скрипта в rc.local"
+  lineinfile:
+    path: "{{ item['path'] }}"
+    line: "{{ item['line'] }}"
+    insertbefore: "{{ item['insertb'] | d('omit') }}"
+  loop:
+    - { path: "/etc/rc.local", line: "{{ firewall_script_file }} start", insertb: "exit 0" }
+  notify: firewall-connect-info
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - firewall
+    - firewall-config

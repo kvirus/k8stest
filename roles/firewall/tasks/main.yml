@@ -1,0 +1,5 @@
+# Импорт задач
+---
+- import_tasks: 'firewall-variables.yml' # Подключаем переменные
+- import_tasks: 'firewall-iptables-install.yml' # Преднастройка
+- import_tasks: 'firewall-iptables-configuration.yml' # Включение правил, включение скрипта автозагрузки

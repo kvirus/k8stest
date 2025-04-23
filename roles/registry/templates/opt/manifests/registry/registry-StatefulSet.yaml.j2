@@ -1,0 +1,34 @@
+{#Манифест для docker-registry как StatefulSet#}
+---
+apiVersion: apps/v1
+kind: "StatefulSet"
+metadata:
+  name: "{{ registry_deploy_config['deploy_name'] }}"
+  namespace: "{{ registry_deploy_config['namespace'] }}"
+spec:
+  serviceName: "{{ registry_deploy_config['deploy_name'] }}"
+  replicas: {{ registry_deploy_config['replicas'] }}
+  selector:
+    matchLabels:
+      app: "{{ registry_deploy_config['deploy_name'] }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ registry_deploy_config['deploy_name'] }}"
+    spec:
+      containers:
+        - name: "{{ registry_deploy_container_config['name'] }}"
+          image: "docker.io/library/{{ registry_deploy_container_config['image'] }}:{{ registry_deploy_container_config['tag'] }}"
+          resources:
+            requests:
+              cpu: "{{ registry_deploy_resource['cpu_min'] }}"
+              memory: "{{ registry_deploy_resource['mem_min'] }}"
+              ephemeral-storage: "{{ registry_deploy_resource['stor_min'] }}"
+            limits:
+              memory: "{{ registry_deploy_resource['mem_max'] }}"
+              ephemeral-storage: "{{ registry_deploy_resource['stor_max'] }}"
+          ports:
+            - containerPort: {{ registry_deploy_config['container_port'] }}
+      nodeSelector:
+        role: "{{ registry_deploy_config['node'] }}"
+

@@ -1,0 +1,9 @@
+# Reload Nginx
+---
+- name: registry-nginx-reload
+  shell: "docker exec {{ registry_deploy_nginx_container }} nginx -t && docker exec {{ registry_deploy_nginx_container }} nginx -s reload"
+  delegate_to: "{{ groups['gateway'][0] }}"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - registry

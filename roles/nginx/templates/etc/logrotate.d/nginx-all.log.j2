@@ -1,0 +1,8 @@
+{#Ротирование всех логов#}
+/var/log/nginx/*.log {
+   daily
+   rotate 7
+   compress
+   missingok
+   notifempty
+ }

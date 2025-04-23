@@ -1,0 +1,3 @@
+upstream registry_upstream {
+        server "{{ registry_deploy_config['ip_gw'] }}:{{ registry_deploy_config['nodeport'] }}";
+    }

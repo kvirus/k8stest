@@ -1,0 +1,15 @@
+{# Сервис для Mysql #}
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "{{ mysql_deploy_cfg['service_name'] }}"
+  namespace: "{{ mysql_deploy_cfg['namespace'] }}"
+spec:
+  selector:
+    app: "{{ mysql_deploy_cfg['deploy_name'] }}"
+  type: "{{ mysql_deploy_cfg['service_type'] }}"
+  ports:
+    - protocol: "{{ mysql_deploy_cfg['protocol'] }}"
+      port: {{ mysql_deploy_cfg['port'] }}
+      targetPort: {{ mysql_deploy_cfg['targetport'] }}

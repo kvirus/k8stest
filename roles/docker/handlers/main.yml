@@ -1,0 +1,4 @@
+# Импорт хендлеров
+---
+- import_tasks: 'docker-ubuntu-clean-handler.yml'
+- import_tasks: 'docker-restart-handler.yml'

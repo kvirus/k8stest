@@ -1,0 +1,9 @@
+# Переменные Centos
+---
+docker_centos_install_pkgs:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+
+docker_centos_baseurl: "https://download.docker.com/linux/centos/{{ ansible_distribution_version }}/{{ ansible_architecture }}/stable"
+docker_centos_gpgkey: "https://download.docker.com/linux/centos/gpg"

@@ -1,0 +1,14 @@
+#  Работа с пакетами Ubuntu
+---
+- name: "Установка пакетов Ubuntu"
+  apt:
+    name: "{{ common_package_ubuntu }}"
+    state: present
+    update_cache: true
+    cache_valid_time: "{{ common_cache_valid_time }}"
+  notify: common-clean-cache-ubuntu
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - common
+    - common-install-app-ubuntu

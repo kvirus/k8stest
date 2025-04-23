@@ -1,0 +1,13 @@
+# Подключаем файлы переменных
+---
+- name: "Подключаем переменные"
+  include_vars:
+    dir: vars/
+  tags:
+    - common
+    - common-configuration-kernel
+    - common-configuration-metadata-centos
+    - common-install-app-centos
+    - common-install-app-ubuntu
+    - common-resolve-centos
+    - common-configuration-services-ubuntu

@@ -1,0 +1,9 @@
+# Подключаем файлы переменных
+---
+- name: "Подключаем переменные"
+  include_vars:
+    dir: vars/
+  tags:
+    - firewall
+    - firewall-config
+    - firewall-install

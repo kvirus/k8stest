@@ -1,0 +1,16 @@
+{#Сервис для Registry#}
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "{{ registry_deploy_config['service_name'] }}"
+  namespace: "{{ registry_deploy_config['namespace'] }}"
+spec:
+  type: "{{ registry_deploy_config['service_type'] }}"
+  selector:
+    app: "{{ registry_deploy_config['deploy_name'] }}"
+  ports:
+    - protocol: "{{ registry_deploy_config['protocol'] }}"
+      port: {{ registry_deploy_config['container_port'] }}
+      targetPort: {{ registry_deploy_config['target_port'] }}
+      nodePort: {{ registry_deploy_config['nodeport'] }}

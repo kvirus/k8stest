@@ -1,0 +1,75 @@
+# Деплой wordpress как 2 реплики
+---
+- name: "Создание директории для манифестов"
+  file:
+    path: "{{ item['path'] }}"
+    mode: "{{ item['mode'] | d('0755') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    state: "directory"
+  loop:
+    - { path: "{{ wordpress_deploy_manifests_dir }}" }
+  when:
+    - inventory_hostname in groups ['k8smaster']
+    - ansible_os_family == "Debian"
+  tags:
+    - wordpress
+
+- name: "Создание директории для хранения статики"
+  file:
+    path: "{{ item['hostdir'] }}"
+    mode: "{{ item['mode'] | d('0755') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    state: "directory"
+  delegate_to: "{{ item['host'] }}"
+  loop: "{{ wordpress_deploy_static }}"
+  when:
+    - inventory_hostname in groups ['k8smaster']
+    - ansible_os_family == "Debian"
+  tags:
+    - wordpress
+
+- name: "Копирование настроек на сервер Nginx"
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "var/nginx/sites-available/wordpress.local.conf.j2", dest: "{{ wordpress_nginx_dir }}/sites-available/wordpress.local.conf"}
+    - { src: "var/nginx/upstreams/wordpress.conf.j2", dest: "{{ wordpress_nginx_dir }}/upstreams/wordpress.conf"}
+  delegate_to: "{{ groups['gateway'][0] }}"
+  notify: wordpress-nginx-reload
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - wordpress
+
+- name: "Перенос манифестов на мастер ноду"
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "opt/manifests/wordpress/wordpress-namespace.yaml.j2", dest: "{{ wordpress_deploy_manifests_dir }}/wordpress-namespace.yaml"}
+    - { src: "opt/manifests/wordpress/wordpress-deploy.yaml.j2", dest: "{{ wordpress_deploy_manifests_dir }}/wordpress-deploy.yaml"}
+    - { src: "opt/manifests/wordpress/wordpress-service.yaml.j2", dest: "{{ wordpress_deploy_manifests_dir }}/wordpress-service.yaml"}
+    - { src: "opt/manifests/wordpress/wordpress-configmap.yaml.j2", dest: "{{ wordpress_deploy_manifests_dir }}/wordpress-configmap.yaml"}
+  when:
+    - inventory_hostname in groups ['k8smaster']
+    - ansible_os_family == "Debian"
+  tags:
+    - wordpress
+
+- name: "Деплой манифестов Wordpress"
+  command: "kubectl apply -f {{ wordpress_deploy_manifests_dir }}/{{ item }}"
+  loop: "{{ wordpress_deploy_manifests }}"
+  when:
+    - inventory_hostname in groups ['k8smaster']
+    - ansible_os_family == "Debian"
+  tags:
+    - wordpress

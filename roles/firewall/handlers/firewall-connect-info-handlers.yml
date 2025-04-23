@@ -1,0 +1,11 @@
+# Выводим информацию о подключении к ОС за Gateway
+---
+- name: firewall-connect-info
+  debug:
+    msg: "Для подключения к ВМ за Gateway используем ip {{ item['ip'] }} порт {{ item['port_rem'] }}"
+  loop: "{{ firewall_vm }}"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - firewall
+    - firewall-config

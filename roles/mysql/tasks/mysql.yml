@@ -1,0 +1,59 @@
+# Деплой  Mysql как StatefulSet
+---
+- name: "Создание директории для манифестов"
+  file:
+    path: "{{ item['path'] }}"
+    mode: "{{ item['mode'] | d('0744') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    state: "directory"
+  loop:
+    - { path: "{{ mysql_deploy_manifests_dir }}" }
+  when:
+    - inventory_hostname in groups ['k8smaster']
+    - ansible_os_family == "Debian"
+  tags:
+    - mysql
+
+- name: "Создание директории для хранения БД"
+  file:
+    path: "{{ item['path'] }}"
+    mode: "{{ item['mode'] | d('0755') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    state: "directory"
+  loop:
+    - { path: "{{ mysql_deploy_db_dir }}" }
+  delegate_to: "{{ groups['k8sworkers'][1] }}"
+  when:
+    - inventory_hostname in groups ['k8smaster']
+    - ansible_os_family == "Debian"
+  tags:
+    - mysql
+
+- name: "Перенос манифестов на мастер ноду"
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "opt/manifests/mysql/mysql-namespace.yaml.j2", dest: "{{ mysql_deploy_manifests_dir }}/mysql-namespace.yaml"}
+    - { src: "opt/manifests/mysql/mysql-secrets.yaml.j2", dest: "{{ mysql_deploy_manifests_dir }}/mysql-secrets.yaml"}
+    - { src: "opt/manifests/mysql/mysql-StatefulSet.yaml.j2", dest: "{{ mysql_deploy_manifests_dir }}/mysql-StatefulSet.yaml"}
+    - { src: "opt/manifests/mysql/mysql-service.yaml.j2", dest: "{{ mysql_deploy_manifests_dir }}/mysql-service.yaml"}
+  when:
+    - inventory_hostname in groups ['k8smaster']
+    - ansible_os_family == "Debian"
+  tags:
+    - mysql
+
+- name: "Деплой манифестов для MySql"
+  command: "kubectl apply -f {{ mysql_deploy_manifests_dir }}/{{ item }}"
+  loop: "{{ mysql_deploy_manifests }}"
+  when:
+    - inventory_hostname in groups ['k8smaster']
+    - ansible_os_family == "Debian"
+  tags:
+    - mysql

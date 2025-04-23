@@ -1,0 +1,65 @@
+# Установка docker на CentOS
+---
+- name: "Добавить репозиторий Docker centos"
+  yum_repository:
+    name: "docker-ce"
+    description: "Docker CE Repository"
+    baseurl: "{{ docker_centos_baseurl }}"
+    enabled: true
+    gpgcheck: true
+    gpgkey: "{{ docker_centos_gpgkey }}"
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - docker
+    - docker-centos-install
+
+- name: "Установить Docker и зависимости centos"
+  yum:
+    name: "{{ docker_centos_install_pkgs }}"
+    state: present
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - docker
+    - docker-centos-install
+
+- name: "Копирование файла настройки registry"
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "etc/docker/daemon.json.j2", dest: "{{ docker_config_directory }}/daemon.json"}
+  notify: docker-restart
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - docker
+    - docker-centos-install
+
+- name: "Запуск сервиса Docker"
+  systemd:
+    name: "{{ item['name'] }}"
+    state: "{{ item['state'] | d('started') }}"
+    enabled: "{{ item['enabled'] }}"
+  loop: "{{ docker_services_list }}"
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - docker
+    - docker-centos-install
+
+- name: "Добавляем пользователя Master в группу Docker"
+  user:
+    name: "{{ item['user'] }}"
+    groups: "{{ item['groups'] }}"
+    append: true
+  loop: "{{ docker_add_group }}"
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - docker
+    - docker-centos-install

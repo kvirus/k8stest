@@ -1,0 +1,62 @@
+{# Деплой Mysql как StatefulSet #}
+---
+apiVersion: "apps/v1"
+kind: "StatefulSet"
+metadata:
+  name: "{{ mysql_deploy_cfg['deploy_name'] }}"
+  namespace: "{{ mysql_deploy_cfg['namespace'] }}"
+spec:
+  serviceName: "{{ mysql_deploy_cfg['deploy_name'] }}"
+  replicas: {{ mysql_deploy_cfg['replicas'] }}
+  selector:
+    matchLabels:
+      app: "{{ mysql_deploy_cfg['deploy_name'] }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ mysql_deploy_cfg['deploy_name'] }}"
+    spec:
+      containers:
+        - name: "{{ mysql_deploy_container_config['name'] }}"
+          image: "docker.io/{{ mysql_deploy_container_config['image'] }}:{{ mysql_deploy_container_config['tag'] }}"
+          env:
+            - name: "MYSQL_ROOT_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ mysql_deploy_cfg['secret'] }}"
+                  key: "MYSQL_ROOT_PASSWORD"
+            - name: "MYSQL_DATABASE"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ mysql_deploy_cfg['secret'] }}"
+                  key: "MYSQL_DATABASE"
+            - name: "MYSQL_USER"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ mysql_deploy_cfg['secret'] }}"
+                  key: "MYSQL_USER"
+            - name: "MYSQL_PASSWORD"
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ mysql_deploy_cfg['secret'] }}"
+                  key: "MYSQL_PASSWORD"
+          resources:
+            requests:
+              cpu: "{{ mysql_deploy_resource['cpu_min'] }}"
+              memory: "{{ mysql_deploy_resource['mem_min'] }}"
+              ephemeral-storage: "{{ mysql_deploy_resource['stor_min'] }}"
+            limits:
+              memory: "{{ mysql_deploy_resource['mem_max'] }}"
+              ephemeral-storage: "{{ mysql_deploy_resource['stor_min'] }}"
+          ports:
+            - containerPort: {{ mysql_deploy_cfg['port'] }}
+          volumeMounts:
+            - name: "{{ mysql_deploy_cfg['volume_name'] }}"
+              mountPath: "/var/lib/mysql"
+      volumes:
+        - name: "{{ mysql_deploy_cfg['volume_name'] }}"
+          hostPath:
+            path: "{{ mysql_deploy_db_dir }}"
+            type: "Directory"
+      nodeSelector:
+          role: "{{ mysql_deploy_cfg['node'] }}"

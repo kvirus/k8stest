@@ -1,0 +1,4 @@
+# Импорт хендлеров
+---
+- import_tasks: 'firewall-connect-info-handlers.yml' # Информация по подключению к ОС за gateway
+- import_tasks: 'firewall-clean-cache-handlers.yml' # Очистка кеша, после установки пакетов

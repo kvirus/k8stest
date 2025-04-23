@@ -1,0 +1,6 @@
+# Необходимые модули для включения в ОС
+---
+common_modules:
+  - nf_conntrack
+  - iptable_nat
+  - br_netfilter

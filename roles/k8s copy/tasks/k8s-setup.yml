@@ -1,0 +1,59 @@
+# Подготовка ОС перед установкой k8s
+---
+- name: "Проверяем, включён ли swap"
+  command: "swapon -s"
+  register: swap_status
+  changed_when: false
+  failed_when: false
+  tags:
+    - k8s
+    - k8s-setup
+
+- name: "Выключаем Swap"
+  command: "swapoff -a"
+  when: swap_status.stdout != ""
+  tags:
+    - k8s
+    - k8s-setup
+
+- name: "Закомментируем swap в fstab"
+  lineinfile:
+    path: "{{ item['path'] }}"
+    regexp: "{{ item['regexp'] }}"
+    line: "{{ item['line'] }}"
+    backrefs: "{{ item['backrefs'] | d('true') }}"
+  loop:
+    - { path: "/etc/fstab", regexp: "^.*swap.*$", line: '#\0' }
+  tags:
+    - k8s
+    - k8s-setup
+
+- name: "Включение необходимых модулей"
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "etc/modules-load.d/k8s_modules.conf.j2", dest: "/etc/modules-load.d/k8s_modules.conf" }
+    - { src: "etc/sysctl.d/99-k8s.conf.j2", dest: "/etc/sysctl.d/99-k8s.conf" }
+  notify: k8s-apply-kernel
+  tags:
+    - k8s
+    - k8s-setup
+
+- name: "Загружаем модули ядра "
+  command:
+    cmd: "modprobe {{ item }}"
+    creates: "/sys/module/{{ item }}"
+  loop: "{{ k8s_modules }}"
+  tags:
+    - k8s
+    - k8s-setup
+
+- name: "Вызов хендлера применения параметров ядра (если нужно)"
+  meta: flush_handlers
+  tags:
+    - k8s
+    - k8s-setup

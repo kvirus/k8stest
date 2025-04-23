@@ -1,0 +1,10 @@
+# Очистка кеша Ubuntu
+---
+- name: firewall-clean-cache
+  apt:
+    autoclean: true
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - firewall
+    - firewall-config

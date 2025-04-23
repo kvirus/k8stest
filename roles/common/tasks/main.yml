@@ -1,0 +1,10 @@
+# Преднастройка ОС. Установка необходимых пакетов, включение отключение служб, включение нужных модулей, установка лимитов на открытые файлы.
+# Импортируем таски
+---
+- import_tasks: 'common-variables.yml' # Импорт переменных
+- import_tasks: 'common-kernel-configuration.yml' # Настройка ядра и количество открытых файлов
+- import_tasks: 'common-services-configuration.yml' # Настройка служб серверов
+- import_tasks: 'common-pkgs-centos-install.yml' # Установка пакетов на сервера (Centos)
+- import_tasks: 'common-pkgs-ubuntu-install.yml' # Установка пакетов на сервера (Ubuntu)
+- import_tasks: 'common-metadata-centos.yml' # Устанавливаем время жизни Cache
+- import_tasks: 'common-resolve-centos.yml' # Резолв для кубернетес (не создается автоматически)

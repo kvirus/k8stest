@@ -1,0 +1,58 @@
+{#Скрипт удаления или добавления правил Firewall#}
+#!/bin/bash
+
+RULES_FILE={{ firewall_rules_file }}
+
+# Проверяем, существует ли файл с правилами
+if [ ! -f "$RULES_FILE" ]; then
+    echo "Файл с правилами $RULES_FILE не найден!"
+    exit 1
+fi
+
+# Функция добавления разрешающих правил
+function accept_policy {
+    eval "iptables -t filter -P INPUT ACCEPT"
+    eval "iptables -t filter -P FORWARD ACCEPT"
+}
+
+function default_policy {
+    eval "iptables -P OUTPUT ACCEPT"
+    eval "iptables -t filter -P INPUT DROP"
+    eval "iptables -t filter -P FORWARD DROP"
+}
+
+# Функция добавления правил
+function add_rules {
+    while IFS= read -r rule; do
+        eval "$rule"
+        echo "Добавлено правило: $rule"
+    done < "$RULES_FILE"
+    default_policy
+}
+
+# Функция удаления правил
+function remove_rules {
+    accept_policy
+    echo "Применены разрешающие правила"
+    while IFS= read -r rule; do
+        rule_to_remove="${rule/A/D}"
+        eval "$rule_to_remove"
+        echo "Удалено правило: $rule_to_remove"
+    done < "$RULES_FILE"
+}
+
+# Выбор start/stop/restart
+case $1 in
+    start)
+        remove_rules
+        add_rules;;
+    stop)
+        remove_rules;;
+    restart)
+        remove_rules
+        add_rules;;
+    *)
+        echo "Неизвестное действие: $1. Используйте start, stop или restart"
+        exit 1
+        ;;
+esac

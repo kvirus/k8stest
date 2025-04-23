@@ -1,0 +1,4 @@
+# Импорт задач
+---
+- import_tasks: 'wordpress-include-vars.yml'
+- import_tasks: 'wordpress.yml'

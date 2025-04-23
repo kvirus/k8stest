@@ -1,0 +1,13 @@
+# Restart Docker
+---
+- name: docker-restart
+  systemd:
+    name: "{{ item['name'] }}"
+    state: "{{ item['state'] | d('restarted') }}"
+    enabled: "{{ item['enabled'] | d('true') }}"
+  loop:
+    - { name: "docker" }
+  tags:
+    - docker
+    - docker-ubuntu-install
+    - docker-centos-install

@@ -1,0 +1,26 @@
+# Установка сервиса на Ubuntu
+---
+- name: "Установка Gluster на Ubuntu"
+  apt:
+    name: "{{ gluster_pkgs_install }}"
+    state: present
+    update_cache: true
+    cache_valid_time: "{{ gluster_cache_valid_time }}"
+    autoclean: true
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - gluster
+    - gluster-brick-ubuntu
+
+- name: "Запуск сервиса Gluster"
+  systemd:
+    name: "{{ item['name'] }}"
+    state: "{{ item['state'] }}"
+    enabled: "{{ item['enabled'] }}"
+  loop: "{{ gluster_services_list }}"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - gluster
+    - gluster-brick-ubuntu

@@ -1,0 +1,7 @@
+# Применение параметров ядра
+---
+- name: k8s-apply-kernel
+  command: "sysctl --system"
+  tags:
+    - k8s
+    - k8s-setup

@@ -1,0 +1,59 @@
+# Разворачиваем docker-registry в кластере как StatefulSet
+---
+- name: "Создание директории для манифестов"
+  file:
+    path: "{{ item['path'] }}"
+    mode: "{{ item['mode'] | d('0744') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    state: "directory"
+  loop:
+    - { path: "{{ registry_deploy_manifests_dir }}" }
+  when:
+    - inventory_hostname in groups ['k8smaster']
+    - ansible_os_family == "Debian"
+  tags:
+    - registry
+
+- name: "Копирование настроек на сервер Nginx"
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "var/nginx/sites-available/registry.local.conf.j2", dest: "{{ registry_nginx_dir }}/sites-available/registry.local.conf"}
+    - { src: "var/nginx/upstreams/registry.conf.j2", dest: "{{ registry_nginx_dir }}/upstreams/registry.conf"}
+  delegate_to: "{{ groups['gateway'][0] }}"
+  notify: registry-nginx-reload
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - registry
+
+- name: "Перенос манифестов на мастер ноду"
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "opt/manifests/registry/registry-namespace.yaml.j2", dest: "{{ registry_deploy_manifests_dir }}/registry-namespace.yaml"}
+    - { src: "opt/manifests/registry/registry-StatefulSet.yaml.j2", dest: "{{ registry_deploy_manifests_dir }}/registry-StatefulSet.yaml"}
+    - { src: "opt/manifests/registry/registry-service.yaml.j2", dest: "{{ registry_deploy_manifests_dir }}/registry-service.yaml"}
+  when:
+    - inventory_hostname in groups ['k8smaster']
+    - ansible_os_family == "Debian"
+  tags:
+    - registry
+
+- name: "Деплой манифестов docker-registry"
+  command: "kubectl apply -f {{ registry_deploy_manifests_dir }}/{{ item }}"
+  loop: "{{ registry_deploy_manifests }}"
+  when:
+    - inventory_hostname in groups ['k8smaster']
+    - ansible_os_family == "Debian"
+  tags:
+    - registry

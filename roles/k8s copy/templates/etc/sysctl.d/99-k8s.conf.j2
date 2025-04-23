@@ -1,0 +1,4 @@
+{# Перебираем параметры для записи в файл#}
+{% for param in k8s_sysctl %}
+{{ param.name }} = {{ param.value }}
+{% endfor %}

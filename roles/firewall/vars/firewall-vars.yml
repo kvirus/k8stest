@@ -1,0 +1,50 @@
+# Для вывода info
+---
+firewall_vm:
+ - '192.168.0.2'
+ - '192.168.0.3'
+ - '192.168.0.6'
+
+# Необходимые пакеты для установки
+firewall_pkgs_install:
+ - iptables
+
+# Валидность кеша
+firewall_cache_valid_time: '86400'
+
+# Директория правил
+firewall_rules_directory: "/etc/firewall"
+
+firewall_rules_file: "/etc/firewall/rules.txt"
+
+firewall_script_file: "/usr/local/sbin/custom_firewall.sh"
+
+# Расположение Nginx
+firewall_nginx:
+ ip: '192.168.0.3' # Ip на котором будет располагаться nginx
+ nodeport: '31080' # Порт NodeIp на котором будет Nginx
+
+# Разрешенные входящие порты
+firewall_accept_ports:
+ - '22'
+ - '80'
+ - '443'
+
+firewall_input_interface: "{{ ansible_default_ipv4.interface }}"
+
+firewall_local_interface: "ens6"
+
+# Правила для копирования в GW
+firewall_iptables_ruls:
+ - "iptables -t nat -A POSTROUTING -o {{ firewall_input_interface }} -j MASQUERADE"
+# Разрешаем входящие порты
+ - "iptables -A INPUT -i {{ firewall_input_interface }} -p tcp -m multiport --destination-port {{ firewall_accept_ports | join(',') }} -j ACCEPT"
+# Разрешающие правила
+ - "iptables -A FORWARD -s {{ firewall_vm[0] }} -j ACCEPT"
+ - "iptables -A FORWARD -s {{ firewall_vm[1] }} -j ACCEPT"
+ - "iptables -A FORWARD -s {{ firewall_vm[2] }} -j ACCEPT"
+ - "iptables -A FORWARD -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT"
+ - "iptables -A INPUT -i {{ firewall_local_interface }} -j ACCEPT"
+ - "iptables -A INPUT -i lo -j ACCEPT"
+# Разрешаем интернет на GW
+ - "iptables -A INPUT -i {{ firewall_input_interface }} -m state --state ESTABLISHED -j ACCEPT"

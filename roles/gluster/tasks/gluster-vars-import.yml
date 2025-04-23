@@ -1,0 +1,11 @@
+# Подключаем файлы переменных
+---
+- name: "Подключаем переменные"
+  include_vars:
+    dir: vars/
+  tags:
+    - gluster
+    - gluster-brick-centos
+    - gluster-brick-ubuntu
+    - gluster-volume-create
+    - gluster-volume-mount

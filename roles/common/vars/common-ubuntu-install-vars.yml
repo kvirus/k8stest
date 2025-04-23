@@ -1,0 +1,43 @@
+# Пакеты для установки Ubuntu
+---
+common_package_ubuntu:
+  - python
+  - python-apt
+  - python3-apt
+  - smartmontools
+  - bash-completion
+  - bridge-utils
+  - bzip2
+  - tar
+  - gzip
+  - lzma
+  - zip
+  - unzip
+  - rsync
+  - telnet
+  - iotop
+  - traceroute
+  - tcpdump
+  - iftop
+  - strace
+  - wget
+  - net-tools
+  - mtr
+  - htop
+  - fping
+  - mlocate
+  - screen
+  - pciutils
+  - cron
+  - curl
+  - conntrack
+  - vlan
+  - sysstat
+  - software-properties-common
+  - aptitude
+  - ca-certificates
+  - apt-transport-https
+  - gpg
+# Валидность кеша
+
+common_cache_valid_time: '86400'

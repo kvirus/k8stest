@@ -1,0 +1,40 @@
+# Переменные для установки k8s
+---
+# Список приложений для блокировки обновления
+k8s_hold_pkgs:
+  - kubelet
+  - kubeadm
+  - kubectl
+
+# Список приложения для установки
+k8s_install_pkgs:
+  "{{ k8s_hold_pkgs + ['containerd'] }}"
+
+# Репозиторий Kubernetes для Centos
+k8s_centos_repo_cfg:
+  name: "Kubernetes_1_29"
+  describe: "Kubernetes repo 1.29"
+  repository: "https://pkgs.k8s.io/core:/stable:/v1.29/rpm/"
+  gpgkey: "https://pkgs.k8s.io/core:/stable:/v1.29/rpm/repodata/repomd.xml.key"
+
+# Пути настроек для ContainerD Centos
+k8s_centos_containerd_cfg:
+  conf_dir: "/etc/containerd"
+  conf_file: "/etc/containerd/config.toml"
+
+# Репозиторий Kubernetes для Ubuntu
+k8s_ubuntu_repo_cfg:
+  repo: "deb [signed-by=/etc/apt/trusted.gpg.d/kubernetes.gpg] https://pkgs.k8s.io/core:/stable:/v1.29/deb/ /"
+  filename: "kubernetes_1_29"
+
+# GPG ключ для репозитория k8s ubuntu
+k8s_ubuntu_gpg_cfg:
+  url: "https://pkgs.k8s.io/core:/stable:/v1.29/deb/Release.key"
+  keyring: "/etc/apt/trusted.gpg.d/kubernetes.gpg"
+
+k8s_cache_valid_time: '86400'
+
+# Сервисы для старта
+k8s_services_list:
+  - { name: "kubelet", enabled: true }
+  - { name: "containerd", enabled: true }

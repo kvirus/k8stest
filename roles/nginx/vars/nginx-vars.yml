@@ -1,0 +1,34 @@
+# Переменные Nginx
+---
+# Путь хранение файлов, подключаемых в контейнеры
+nginx_dir: "/var/nginx"
+
+# Путь хранения статики
+nginx_gluster_dir: "/mnt/glusterfs/nginx/usr/share/nginx/html/image"
+
+# Конфигурация контейнера
+nginx_container_config:
+  - name: "nginx"
+    image: "192.168.0.1:5000/my_nginx"
+    tag: '1.27.4'
+    volumes:
+      - "/var/nginx/nginx.conf:/etc/nginx/nginx.conf"
+      - "/var/nginx/sites-available:/etc/nginx/sites-available"
+      - "/var/nginx/upstreams:/etc/nginx/upstreams"
+      - "/var/nginx/ssl:/etc/nginx/ssl"
+      - "/var/log/nginx:/var/log/nginx"
+      - "/var/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf"
+      - "{{ nginx_gluster_dir }}:/usr/share/nginx/html/image"
+    log_driver: "json-file"
+    log_options:
+      max-size: "10m"
+      max-file: '5'
+
+# Параметры Подов Кубернитес
+nginx_registry_cfg:
+  nodeport: '31081'
+  k8s_ip: '192.168.0.6'
+
+nginx_wordpress_cfg:
+  nodeport: '31082'
+  k8s_ip: '192.168.0.6'

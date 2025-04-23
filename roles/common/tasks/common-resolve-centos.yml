@@ -1,0 +1,31 @@
+# Создание файла resolve для дальнейшей установки kubernetes
+---
+- name: "Создание директории"
+  file:
+    path: "{{ item['path'] }}"
+    mode: "{{ item['mode'] | d('0744') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    state: "directory"
+  loop:
+    - { path: "{{ common_resolve_dir }}" }
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - common
+    - common-resolve-centos
+
+- name: "Создание файла resolv.conf"
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "run/systemd/resolve/resolv.conf.j2", dest: "/run/systemd/resolve/resolv.conf" }
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - common
+    - common-resolve-centos

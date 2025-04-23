@@ -1,0 +1,13 @@
+# Установка необходимых пакетов в CentOS
+---
+- name: "Установка пакетов Centos"
+  yum:
+    name: "{{ common_package_centos }}"
+    state: present
+    update_cache: true
+  notify: common-clean-cache-centos
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - common
+    - common-install-app-centos

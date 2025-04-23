@@ -1,0 +1,49 @@
+# Переменные деплоя Mysql
+---
+# Путь копирования манифестов для развертывания
+mysql_deploy_manifests_dir: "/opt/manifests/mysql"
+
+# Путь хранение БД на гластере
+mysql_deploy_db_dir: "/mnt/glusterfs/mysql"
+
+# Настройки развертывания
+mysql_deploy_cfg:
+  deploy_name: "mysql"
+  namespace: "wordpress"
+  node: "back"
+  secret: "mysql-secret"
+  service_name: "mysql-service"
+  service_type: "ClusterIP"
+  protocol: "TCP"
+  targetport: '3306'
+  port: '3306'
+  volume_name: "host-storage"
+  replicas: '1'
+
+# Настройки Img
+mysql_deploy_container_config:
+  name: "mysql"
+  image: "mysql"
+  tag: '9.2.0'
+
+# Манифесты для развертывания
+mysql_deploy_manifests:
+  - "mysql-namespace.yaml"
+  - "mysql-secrets.yaml"
+  - "mysql-StatefulSet.yaml"
+  - "mysql-service.yaml"
+
+# Ограничение ресурсов
+mysql_deploy_resource:
+  cpu_min: "300m"
+  mem_min: "512Mi"
+  stor_min: "300Mi"
+  mem_max: "1Gi"
+  stor_max: "400Mi"
+
+# Доступы к БД
+mysql_deploy_secrets:
+  root_passwd: "{{ 'PaSSwd12' | b64encode }}"
+  db: "{{ 'newbd' | b64encode }}"
+  user: "{{ 'admin' | b64encode }}"
+  user_passwd: "{{ 'p@ssWd12' | b64encode }}"

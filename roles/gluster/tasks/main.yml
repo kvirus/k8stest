@@ -1,0 +1,7 @@
+# Импорт задач
+---
+- import_tasks: 'gluster-vars-import.yml' # Импорт переменных
+- import_tasks: 'gluster-centos-install.yml' # Установка сервиса на Centos
+- import_tasks: 'gluster-ubuntu-install.yml' # Установка сервиса на Ubuntu
+- import_tasks: 'gluster-volume-create.yml' # Создание Volume, подключение бриков
+- import_tasks: 'gluster-volume-mount.yml' # Монтирование Gluster Volume

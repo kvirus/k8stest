@@ -1,0 +1,71 @@
+# Деплой контейнера nginx
+---
+- name: "Создание директории для конфигурации и сертификатов"
+  file:
+    path: "{{ item['path'] }}"
+    state: "directory"
+    mode: "{{ item['mode'] | d('0755') }}"
+  loop:
+    - { path: "{{ nginx_gluster_dir }}" }
+    - { path: "{{ nginx_dir }}" }
+    - { path: "{{ nginx_dir }}/ssl" }
+    - { path: "{{ nginx_dir }}/conf.d" }
+    - { path: "{{ nginx_dir }}/upstreams" }
+    - { path: "{{ nginx_dir }}/sites-available" }
+    - { path: "{{ nginx_dir }}/ssl/registry" }
+    - { path: "{{ nginx_dir }}/ssl/wordpress" }
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - nginx
+
+- name: "Копируем статические ресурсы"
+  copy:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "usr/share/nginx/html/devops.png", dest: "{{ nginx_gluster_dir }}/devops.png" }
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - nginx
+
+- name: "Копирование настроек Nginx из темплейта"
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "var/nginx/ssl/registry/registry.crt.j2", dest: "{{ nginx_dir }}/ssl/registry/registry.crt"}
+    - { src: "var/nginx/ssl/registry/registry.key.j2", dest: "{{ nginx_dir }}/ssl/registry/registry.key"}
+    - { src: "var/nginx/ssl/wordpress/wordpress.crt.j2", dest: "{{ nginx_dir }}/ssl/wordpress/wordpress.crt"}
+    - { src: "var/nginx/ssl/wordpress/wordpress.key.j2", dest: "{{ nginx_dir }}/ssl/wordpress/wordpress.key"}
+    - { src: "var/nginx/nginx.conf.j2", dest: "{{ nginx_dir }}/nginx.conf"}
+    - { src: "etc/nginx/conf.d/default.conf.j2", dest: "{{ nginx_dir }}/conf.d/default.conf"}
+    - { src: "etc/logrotate.d/nginx-all.log.j2", dest: "/etc/logrotate.d/nginx-all.log"}
+
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - nginx
+
+- name: "Разворачиваем контейнер Nginx"
+  docker_container:
+    name: "{{ item['name'] }}"
+    image: "{{ item['image'] }}:{{ item['tag'] }}"
+    state: "{{ item['state'] | d('started') }}"
+    restart_policy: "{{ item['restart'] | d('always') }}"
+    network_mode: "{{ item['network'] | d('host') }}"
+    volumes: "{{ item['volumes'] | d('omit') }}"
+    log_driver: "{{ item['log_driver'] | d('omit') }}"
+    log_options: "{{ item['log_options'] | d('omit') }}"
+  loop: "{{ nginx_container_config }}"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - nginx

@@ -1,0 +1,17 @@
+# Настройка Gluster
+---
+gluster_services_list:
+  - { name: "glusterd", state: "started", enabled: true }
+
+gluster_bricks:
+  - "192.168.0.3"
+  - "192.168.0.2"
+  - "192.168.0.1" # Последним ставится Арбитр
+
+gluster_config:
+  name: "glustervol"
+  mount: "/mnt/glusterfs"
+  replicas: '3'
+  arbiters: '1'
+  brick_dir: "/glusterfs/brick"
+  bricks: "{{ gluster_bricks }}"

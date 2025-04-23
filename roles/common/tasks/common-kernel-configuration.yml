@@ -1,0 +1,36 @@
+# Подключение модулей ядра и увеличения лимитов открытых файлов
+---
+- name: "Включение необходимых модулей"
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "etc/modules-load.d/modules.conf.j2", dest: "/etc/modules-load.d/modules.conf" }
+  tags:
+    - common
+    - common-configuration-kernel
+
+- name: "Загружаем модули ядра "
+  command:
+    cmd: "modprobe {{ item }}"
+    creates: "/sys/module/{{ item }}"
+  loop: "{{ common_modules }}"
+  tags:
+    - common
+    - common-configuration-kernel
+
+- name: "Увеличение лимитов открытых файлов в /etc/security/limits.conf"
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "etc/security/limits.conf.j2", dest: "/etc/security/limits.conf" }
+  tags:
+    - common
+    - common-configuration-limits

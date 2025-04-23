@@ -1,0 +1,37 @@
+# Пакеты для установки CentOS
+---
+common_package_centos:
+  - python
+  - smartmontools
+  - bash-completion
+  - bridge-utils
+  - bzip2
+  - tar
+  - gzip
+  - lzma
+  - zip
+  - unzip
+  - rsync
+  - telnet
+  - iotop
+  - traceroute
+  - tcpdump
+  - iftop
+  - strace
+  - wget
+  - net-tools
+  - mtr
+  - htop
+  - fping
+  - mlocate
+  - screen
+  - pciutils
+  - curl
+  - conntrack
+  - sysstat
+  - yum-utils
+  - python-requests
+  - ca-certificates
+  - gpg
+
+common_resolve_dir: "/run/systemd/resolve"

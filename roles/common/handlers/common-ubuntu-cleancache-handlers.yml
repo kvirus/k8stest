@@ -1,0 +1,10 @@
+# Очистка кеша Ubuntu
+---
+- name: common-clean-cache-ubuntu
+  apt:
+    autoclean: true
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - common
+    - common-install-app-ubuntu

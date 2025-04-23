@@ -1,0 +1,5 @@
+# Импорт задач
+---
+- import_tasks: 'docker-variables.yml' # Подключаем переменные
+- import_tasks: 'docker-centos-install.yml' # Установка Docker Centos
+- import_tasks: 'docker-ubuntu-install.yml' # Установка Docker Ubuntu

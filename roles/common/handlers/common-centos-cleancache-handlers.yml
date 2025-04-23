@@ -1,0 +1,9 @@
+# Очистка кеша CentOS
+---
+- name: common-clean-cache-centos
+  command: yum clean all
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - common
+    - common-install-app-centos

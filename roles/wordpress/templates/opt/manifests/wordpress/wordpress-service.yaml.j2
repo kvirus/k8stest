@@ -1,0 +1,16 @@
+{#Сервис для Registry#}
+---
+apiVersion: "v1"
+kind: "Service"
+metadata:
+  name: "{{ wordpress_deploy_cfg['service_name'] }}"
+  namespace: "{{ wordpress_deploy_cfg['namespace'] }}"
+spec:
+  type: "{{ wordpress_deploy_cfg['service_type'] }}"
+  selector:
+    app: "{{ wordpress_deploy_cfg['deploy_name'] }}"
+  ports:
+    - protocol: "{{ wordpress_deploy_cfg['protocol'] }}"
+      port: {{ wordpress_deploy_cfg['port'] }}
+      targetPort: {{ wordpress_deploy_cfg['targetport'] }}
+      nodePort: {{ wordpress_deploy_cfg['nodeport'] }}

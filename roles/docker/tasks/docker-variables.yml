@@ -1,0 +1,9 @@
+# Подключаем файлы переменных
+---
+- name: "Подключаем переменные"
+  include_vars:
+    dir: vars/
+  tags:
+    - docker
+    - docker-ubuntu-install
+    - docker-centos-install

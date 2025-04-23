@@ -1,0 +1,44 @@
+# Переменные для Registry deployment
+---
+# Путь копирования манифестов для развертывания
+registry_deploy_manifests_dir: "/opt/manifests/registry"
+
+# Название контейнера Nginx для перезагрузки настроек
+registry_deploy_nginx_container: "nginx"
+
+# Путь куда сохранять upstreams и настройки sites-available"
+registry_nginx_dir: "/var/nginx"
+
+# Манифесты для развертывания
+registry_deploy_manifests:
+  - "registry-namespace.yaml"
+  - "registry-StatefulSet.yaml"
+  - "registry-service.yaml"
+
+# Конфигурация Img для развертывания
+registry_deploy_container_config:
+  name: "registry"
+  image: "registry"
+  tag: '2'
+
+# Настройки развертывания
+registry_deploy_config:
+  deploy_name: "docker-registry"
+  namespace: "registry"
+  service_name: "registry"
+  node: "front"
+  container_port: '5000'
+  target_port: '5000'
+  replicas: '1'
+  protocol: "TCP"
+  service_type: "NodePort"
+  nodeport: '31081'
+  ip_gw: '192.168.0.6'
+
+# Ограничение ресурсов
+registry_deploy_resource:
+  cpu_min: "200m"
+  mem_min: "256Mi"
+  stor_min: "200Mi"
+  mem_max: "512Mi"
+  stor_max: "400Mi"

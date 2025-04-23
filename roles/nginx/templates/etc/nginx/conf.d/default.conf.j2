@@ -1,0 +1,30 @@
+server {
+    listen 80;
+    server_name _;
+
+    access_log  /var/log/nginx/access.log  main;
+
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl;
+    server_name _;
+
+    ssl_certificate /etc/nginx/ssl/server.crt;
+    ssl_certificate_key /etc/nginx/ssl/server.key;
+
+    location / {
+        add_header Content-Type text/html;
+        return 200 '<html><head><title>200 OK</title></head><body><h1>200 OK</h1><p>This is 200!</p></body></html>';
+    }
+
+    location /image/ {
+        root /usr/share/nginx/html;
+    }
+
+    access_log  /var/log/nginx/access.log  main;
+
+}

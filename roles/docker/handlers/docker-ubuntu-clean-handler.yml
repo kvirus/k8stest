@@ -1,0 +1,10 @@
+# Очистка кеша Ubuntu
+---
+- name: docker-clean-handler
+  apt:
+    autoclean: true
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - docker
+    - docker-ubuntu-install

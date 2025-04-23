@@ -1,0 +1,132 @@
+# Инициализация кластера Kubernetes
+---
+- name: "Инициализируем кластер Kubernetes"
+  command:
+    cmd: "kubeadm init --pod-network-cidr={{ k8s_config['pod_network'] }}"
+    creates: "{{ k8s_config['cfg_file'] }}"
+  when:
+    - inventory_hostname in groups['k8smaster']
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s
+    - k8s-cluster-init
+
+- name: "Создание директории для конфигурации кластера"
+  file:
+    path: "{{ item['path'] }}"
+    mode: "{{ item['mode'] | d('0700') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    state: "directory"
+  loop:
+    - { path: "{{ ansible_env.HOME }}/.kube" }
+  when:
+    - inventory_hostname in groups['k8smaster']
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s
+    - k8s-cluster-init
+
+- name: "Копирование конфигурационного файла кластера"
+  copy:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    mode: "{{ item['mode'] | d('0600') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    force: true
+    remote_src: true
+  loop:
+    - { src: "/etc/kubernetes/admin.conf", dest: "{{ ansible_env.HOME }}/.kube/config" }
+  when:
+    - inventory_hostname in groups['k8smaster']
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s
+    - k8s-cluster-init
+
+- name: "Проверяем, установлен ли Flannel"
+  command: "kubectl get daemonset kube-flannel-ds -n kube-flannel"
+  register: flannel_check
+  failed_when: false
+  changed_when: false
+  when:
+    - inventory_hostname in groups['k8smaster']
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s
+    - k8s-cluster-init
+
+- name: "Скачиваем файл установки сетевого адаптера Flannel"
+  get_url:
+    url: "{{ item['url'] }}"
+    dest: "{{ item['dest'] }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+  loop:
+    - {url: "{{ k8s_config['network_url'] }}", dest: "{{  k8s_config['network_path'] }}"}
+  when:
+    - inventory_hostname in groups['k8smaster']
+    - ansible_os_family == "Debian"
+    - flannel_check.rc != 0
+  tags:
+    - k8s
+    - k8s-cluster-init
+
+- name: "Установка сетевого адаптера Flannel "
+  command: "kubectl apply -f {{ k8s_config['network_path'] }} --validate=false"
+  when:
+    - inventory_hostname in groups ['k8smaster']
+    - ansible_os_family == "Debian"
+    - flannel_check.rc != 0
+  tags:
+    - k8s
+    - k8s-cluster-init
+
+- name: "Проверяем подключена ли нода"
+  stat:
+    path: "{{ k8s_config['cfg_file_workers'] }}"
+  register: kubelet_cfg_status
+  when:
+    - inventory_hostname in groups ['k8sworkers']
+  tags:
+    - k8s
+    - k8s-cluster-init
+
+- name: "Подключаем Воркер ноды"
+  block:
+    - name: "Получаем команду присоединения к кластеру"
+      command: "{{ k8s_config['connect_str'] }}"
+      register: k8s_join
+      delegate_to: "{{ groups['k8smaster'][0] }}"
+      when:
+        - inventory_hostname in groups['k8sworkers']
+      tags:
+        - k8s
+        - k8s-cluster-init
+
+    - name: "запись команды присоединения к кластеру"
+      set_fact:
+        join_command: "{{ k8s_join.stdout_lines[0] }}"
+      when:
+        - inventory_hostname in groups['k8sworkers']
+      tags:
+        - k8s
+        - k8s-cluster-init
+
+    - name: "Выполняем команду присоединения к кластеру"
+      command:
+        cmd: "{{ join_command }}"
+        creates: "{{ k8s_config['cfg_file_workers'] }}"
+      when:
+        - inventory_hostname in groups ['k8sworkers']
+      tags:
+        - k8s
+        - k8s-cluster-init
+  when:
+    - inventory_hostname in groups ['k8sworkers']
+    - not kubelet_cfg_status.stat.exists
+  tags:
+    - k8s
+    - k8s-cluster-init

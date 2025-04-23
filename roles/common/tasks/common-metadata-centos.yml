@@ -1,0 +1,12 @@
+# Прописываем время жизни пакетов CentOS
+---
+- name: "Время жизни кеша Centos"
+  lineinfile:
+    path: "/etc/yum.conf"
+    line: "metadata_expire=360m"
+    state: present
+  when:
+    - ansible_os_family == "RedHat"
+  tags:
+    - common
+    - common-configuration-metadata-centos

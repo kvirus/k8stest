@@ -1,0 +1,3 @@
+# Импорт хендлеров
+---
+- import_tasks: 'wordpress-nginx-reload-handlers.yml' # Reload Nginx

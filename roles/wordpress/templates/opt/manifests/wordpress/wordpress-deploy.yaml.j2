@@ -1,0 +1,45 @@
+{# Деплой  Wordpress#}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ wordpress_deploy_cfg['deploy_name'] }}"
+  namespace: "{{ wordpress_deploy_cfg['namespace'] }}"
+spec:
+  replicas: {{ wordpress_deploy_cfg['replicas'] }}
+  selector:
+    matchLabels:
+      app: "{{ wordpress_deploy_cfg['deploy_name'] }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ wordpress_deploy_cfg['deploy_name'] }}"
+    spec:
+      containers:
+        - name: "{{ wordpress_deploy_container_config['name'] }}"
+          image: "docker.io/library/{{ wordpress_deploy_container_config['image'] }}:{{ wordpress_deploy_container_config['tag'] }}"
+          resources:
+            requests:
+              cpu: "{{ wordpress_deploy_resource['cpu_min'] }}"
+              memory: "{{ wordpress_deploy_resource['mem_min'] }}"
+              ephemeral-storage: "{{ wordpress_deploy_resource['stor_min'] }}"
+            limits:
+              memory: "{{ wordpress_deploy_resource['mem_max'] }}"
+              ephemeral-storage: "{{ wordpress_deploy_resource['stor_max'] }}"
+          ports:
+            - containerPort: {{ wordpress_deploy_cfg['port'] }}
+          volumeMounts:
+            - name: "{{ wordpress_deploy_cfg['storage_name'] }}"
+              mountPath: "/var/www/html"
+            - name: "{{ wordpress_deploy_cfg['config_name'] }}"
+              mountPath: "/var/www/html/wp-config.php"
+              subPath: "wp-config.php"
+      volumes:
+        - name: "{{ wordpress_deploy_cfg['storage_name'] }}"
+          hostPath:
+            path: "{{ wordpress_deploy_hostdir }}"
+            type: "DirectoryOrCreate"
+        - name: "{{ wordpress_deploy_cfg['config_name'] }}"
+          configMap:
+            name: "{{ wordpress_deploy_cfg['configmap_name'] }}"
+

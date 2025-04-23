@@ -1,0 +1,67 @@
+# Переменные депллоя Wordpress
+---
+# Путь хранение БД на гластере
+wordpress_deploy_hostdir: "/mnt/glusterfs/wordpress"
+
+# Название контейнера Nginx для перезагрузки настроек
+wordpress_deploy_nginx_container: "nginx"
+
+# Путь куда сохранять upstreams и настройки sites-available"
+wordpress_nginx_dir: "/var/nginx"
+
+# переменные для создания директорий на Gluster
+wordpress_deploy_static:
+  - hostdir: "{{ wordpress_deploy_hostdir }}"
+    host: "{{ groups['k8sworkers'][0] }}"
+  - hostdir: "{{ wordpress_deploy_hostdir }}"
+    host: "{{ groups['k8sworkers'][1] }}"
+
+# Манифесты для развертывания
+wordpress_deploy_manifests_dir: "/opt/manifests/wordpress"
+
+# Название сервиса Mysql для подключения к БД
+wordpress_deploy_mysql_service: "mysql-service"
+
+# Конфигурация Img для развертывания
+wordpress_deploy_container_config:
+  name: "wordpress"
+  image: "wordpress"
+  tag: '6.7'
+
+# Настройки развертывания
+wordpress_deploy_cfg:
+  deploy_name: "wordpress"
+  namespace: "wordpress"
+  service_name: "wordpress-service"
+  port: '80'
+  targetport: '80'
+  replicas: '2'
+  protocol: "TCP"
+  service_type: "NodePort"
+  storage_name: "wordpress-storage"
+  db_service: "mysql-service"
+  configmap_name: "wp-config"
+  config_name: "wps-conf"
+  nodeport: '31082'
+  ip_gw: '192.168.0.6'
+
+# Параметры подключения к базе данных
+wordpress_deploy_env:
+  db: "newbd"
+  db_user: "admin"
+  db_passwd: "p@ssWd12"
+
+# Манифесты для развертывания
+wordpress_deploy_manifests:
+  - "wordpress-namespace.yaml"
+  - "wordpress-configmap.yaml"
+  - "wordpress-deploy.yaml"
+  - "wordpress-service.yaml"
+
+# Ограничение ресурсов
+wordpress_deploy_resource:
+  cpu_min: "300m"
+  mem_min: "512Mi"
+  stor_min: "200Mi"
+  mem_max: "1Gi"
+  stor_max: "300Mi"

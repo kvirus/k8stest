@@ -1,0 +1,14 @@
+# Установка необходимых пакетов
+---
+- name: "Установка нужных пакетов"
+  apt:
+    name: "{{ firewall_pkgs_install }}"
+    state: present
+    update_cache: true
+    cache_valid_time: "{{ firewall_cache_valid_time }}"
+  notify: firewall-clean-cache
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - firewall
+    - firewall-install
