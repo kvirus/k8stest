@@ -8,18 +8,20 @@
 
 - name: "Исключаем swap из fstab" # Может и не заработать, проверить ОТКЛЮЧИЛСЯ ИЛИ НЕТ
   mount:
-    name: "swap"
-    fstype: "swap"
-    state: absent
+    name: "{{ item['name'] }}"
+    fstype: "{{ item['fstype'] }}"
+    state: "{{ item['state'] | d('absent')}}"
+  loop:
+    - {{ name: "swap", fstype: "swap" }}
   tags:
     - k8s
     - k8s-setup
 
 - name: "Применяем модули ядра"
   community.general.modprobe:
-    name: "{{ item }}"
-    state: present
-    persistent: true
+    name: "{{ item['name'] }}"
+    state: "{{ item['state'] | d('present') }}"
+    persistent: "{{ item['persistent'] | d('present') }}"
   loop: "{{ k8s_modules }}"
   tags:
     - k8s
@@ -29,7 +31,7 @@
   ansible.posix.sysctl:
     name: "{{ item['name'] }}"
     value: "{{ item['value'] }}"
-    state: present
+    state: "{{ item['state'] | d('present') }}"
     reload: true
   loop: "{{ k8s_sysctl }}"
   tags:

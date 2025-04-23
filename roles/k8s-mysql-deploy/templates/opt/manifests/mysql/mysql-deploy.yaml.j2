@@ -50,5 +50,5 @@ spec:
           hostPath:
             path: "{{ k8s_mysql_deploy_db_dir }}"
             type: "Directory"
-      {# nodeSelector:
-        kubernetes.io/hostname: "{{ k8s_mysql_deploy_cfg['node'] }}" #}
+      nodeSelector:
+          role: "{{ k8s_mysql_deploy_cfg['node'] }}"

@@ -1,58 +1,41 @@
 ---
-- name: "Конфигурирования Gateway"
+- name: "Настройка всех хостов"
+  hosts: all
+  roles:
+    - common
+    - docker
+    - gluster
+
+- name: "Поднимаем Nginx и registry"
   hosts: gateway
   roles:
-    - common
-    - firewall
-    - docker
     - registry
-    - gluster
-
-- name: "Базовое конфигурирование OS за GW"
-  hosts: vps
-  roles:
-    - common
-    - docker
-    - gluster
-
-- name: "Настройка Арбитра, создание Volume"
-  hosts: glarbitr
-  roles:
-    - gluster
-
-- name: "Подключение Gluster Volume"
-  hosts: glrbriks
-  roles:
-    - gluster
-
-# Поднимаем контейнеры
+    - nginx
 
 - name: "Поднимаем mysql"
   hosts: db
   roles:
     - mysql
 
-- name: "wordpress"
+- name: "Поднимаем wordpress"
   hosts: wordpress
   roles:
     - wordpress
 
-- name: "Поднимаем Nginx"
+- name: "Конфигурирования Gateway"
   hosts: gateway
   roles:
-    - nginx
+    - firewall
 
-# Kubernetes
-
-- name: "Установка кубернетес (мастер и воркеры)"
+- name: "Разворачиваем Kubernetes"
   hosts: k8s-master, workers
   roles:
     - k8s
 
-- name: "Деплои"
+- name: "Деплой сервисов"
   hosts: k8s-master
   roles:
-    - k8s-mysql-deploy
     - k8s-registry-deploy
+    - k8s-mysql-deploy
     - k8s-wordpress-deploy
     - k8s-nginx-deploy

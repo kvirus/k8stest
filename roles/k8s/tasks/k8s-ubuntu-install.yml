@@ -20,7 +20,7 @@
     filename: "{{ item['filename'] }}"
     update_cache: true
   loop:
-    - "{{ k8s_ubuntu_repo }}"
+    - "{{ k8s_ubuntu_repo_cfg }}"
   when:
     - ansible_os_family == "Debian"
   tags:
@@ -33,7 +33,7 @@
     cache_valid_time: "{{ k8s_cache_valid_time }}"
     state: present
     update_cache: true
-  notify: k8s-clean-handler
+    autoclean: true
   when:
     - ansible_os_family == "Debian"
   tags:

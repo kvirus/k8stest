@@ -12,7 +12,7 @@ k8s_centos_repo_cfg:
   repository: "https://pkgs.k8s.io/core:/stable:/v1.32/rpm/"
   gpgkey: "https://pkgs.k8s.io/core:/stable:/v1.32/rpm/repodata/repomd.xml.key"
 
-k8s_ubuntu_repo:
+k8s_ubuntu_repo_cfg:
   repo: "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /"
   filename: "kubernetes"
 

@@ -1,14 +1,6 @@
 [gateway]
 ubuntugw ansible_host=10.0.15.38 ansible_port=22 ansible_user=master
 
-[vps:children]
-wordpress
-db
-
-[k8s-workers:children]
-wordpress
-db
-
 [wordpress]
 centosvm ansible_host=10.0.15.38 ansible_port=2222 ansible_user=master
 
@@ -16,8 +8,15 @@ centosvm ansible_host=10.0.15.38 ansible_port=2222 ansible_user=master
 ubuntuvm ansible_host=10.0.15.38 ansible_port=4422 ansible_user=master
 
 [k8s-master]
-k8s-master ansible_host=10.0.15.32 ansible_port=22 ansible_user=master
+k8smaster ansible_host=192.168.0.6 ansible_port=5522 ansible_user=master
 
-[workers]
-worker1 ansible_host=10.0.15.38 ansible_port=2222 ansible_user=master
-worker2 ansible_host=10.0.15.38 ansible_port=4422 ansible_user=master
+[glarbitr:children]
+gateway
+
+[glbiks:children]
+db
+wordpress
+
+[k8s-workers:children]
+ubuntuvm
+centosvm

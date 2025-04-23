@@ -4,6 +4,8 @@
   file:
     path: "{{ item['path'] }}"
     mode: "{{ item['mode'] | d('0744') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
     state: "directory"
     recurse: true
   loop:
@@ -15,22 +17,13 @@
 
 - name: "Создание директории для хранения статики"
   file:
-    path: "{{ k8s_wordpress_hostdir }}"
-    mode: '0744'
+    path: "{{ item['hostdir'] }}"
+    mode: "{{ item['mode'] | d('0744') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
     state: "directory"
-  delegate_to: "{{ item }}"
-  loop: "{{ groups['workers'] }}"
-  when:
-    - ansible_os_family == "Debian"
-  tags:
-    - k8s-wordpress-deploy
-
-- name: "Создание Namespace"
-  kubernetes.core.k8s:
-    name: "{{ k8s_wordpress_cfg['namespace'] }}"
-    api_version: "v1"
-    kind: "Namespace"
-    state: present
+  delegate_to: "{{ item['host'] }}"
+  loop: "{{ k8s_wordpress_static }}"
   when:
     - ansible_os_family == "Debian"
   tags:
@@ -44,21 +37,31 @@
     group: "{{ item['group'] | d('root') }}"
     mode: "{{ item['mode'] | d('0644') }}"
   loop:
+    - { src: "opt/manifests/wordpress/wordpress-namespace.yaml.j2", dest: "{{ k8s_wordpress_manifests_dir }}/wordpress-namespace.yaml"}
     - { src: "opt/manifests/wordpress/wordpress-deploy.yaml.j2", dest: "{{ k8s_wordpress_manifests_dir }}/wordpress-deploy.yaml"}
-    - { src: "opt/manifests/wordpress/wordpress-secrets.yaml.j2", dest: "{{ k8s_wordpress_manifests_dir }}/wordpress-secrets.yaml"}
-    - { src: "opt/manifests/wordpress/wordpress-deploy-service.yaml.j2", dest: "{{ k8s_wordpress_manifests_dir }}/wordpress-deploy-service.yaml"}
-    - { src: "opt/manifests/wordpress/wordpress-deploy-configmap.yaml.j2", dest: "{{ k8s_wordpress_manifests_dir }}/wordpress-deploy-configmap.yaml"}
+    - { src: "opt/manifests/wordpress/wordpress-service.yaml.j2", dest: "{{ k8s_wordpress_manifests_dir }}/wordpress-deploy-service.yaml"}
+    - { src: "opt/manifests/wordpress/wordpress-configmap.yaml.j2", dest: "{{ k8s_wordpress_manifests_dir }}/wordpress-deploy-configmap.yaml"}
   when:
     - ansible_os_family == "Debian"
   tags:
     - k8s-wordpress-deploy
+
+# - name: "Создание Namespace"
+#   kubernetes.core.k8s:
+#     name: "{{ k8s_wordpress_cfg['namespace'] }}"
+#     api_version: "v1"
+#     kind: "Namespace"
+#     state: present
+#   when:
+#     - ansible_os_family == "Debian"
+#   tags:
+#     - k8s-wordpress-deploy
 
 - name: "Деплой манифестов Wordpress"
   kubernetes.core.k8s:
     src: "{{ k8s_wordpress_manifests_dir }}/{{ item }}"
     state: present
   loop: "{{ k8s_wordpress_manifests }}"
-  delegate_to: "{{ groups['k8s-master'][0] }}"
   when:
     - ansible_os_family == "Debian"
   tags:

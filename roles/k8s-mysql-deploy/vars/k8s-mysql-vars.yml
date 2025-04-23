@@ -24,6 +24,7 @@ k8s_mysql_deploy_container_config:
   tag: '9.2.0'
 
 k8s_mysql_deploy_manifests:
+  - mysql-namespace.yaml
   - mysql-secrets.yaml
   - mysql-deploy.yaml
   - mysql-service.yaml

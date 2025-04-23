@@ -9,5 +9,5 @@ k8s_config:
   copy_config_dir: "/home/master/.kube/config"
 
 k8s_worker_label:
-  - { name: "worker1", role: "front" }
-  - { name: "worker2", role: "back" }
+  - { name: "centosvm", role: "front" }
+  - { name: "ubuntuvm", role: "back" }

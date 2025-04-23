@@ -4,6 +4,8 @@
   file:
     path: "{{ item['path'] }}"
     mode: "{{ item['mode'] | d('0744') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
     state: "directory"
   loop:
     - { path: "{{ k8s_registry_deploy_manifests_dir }}" }
@@ -20,6 +22,7 @@
     group: "{{ item['group'] | d('root') }}"
     mode: "{{ item['mode'] | d('0644') }}"
   loop:
+    - { src: "opt/manifests/registry/registry-namespace.yaml.j2", dest: "{{ k8s_registry_deploy_manifests_dir }}/registry-namespace.yaml"}
     - { src: "opt/manifests/registry/registry-deploy.yaml.j2", dest: "{{ k8s_registry_deploy_manifests_dir }}/registry-deploy.yaml"}
     - { src: "opt/manifests/registry/registry-service.yaml.j2", dest: "{{ k8s_registry_deploy_manifests_dir }}/registry-service.yaml"}
   when:
@@ -27,23 +30,22 @@
   tags:
     - k8s-registry-deploy
 
-- name: "Создание Namespace"
-  kubernetes.core.k8s:
-    name: "{{ k8s_registry_deploy_config['namespace'] }}"
-    api_version: "v1"
-    kind: "Namespace"
-    state: present
-  when:
-    - ansible_os_family == "Debian"
-  tags:
-    - k8s-registry-deploy
+# - name: "Создание Namespace"
+#   kubernetes.core.k8s:
+#     name: "{{ k8s_registry_deploy_config['namespace'] }}"
+#     api_version: "v1"
+#     kind: "Namespace"
+#     state: present
+#   when:
+#     - ansible_os_family == "Debian"
+#   tags:
+#     - k8s-registry-deploy
 
 - name: "Деплой манифестов docker-registry"
   kubernetes.core.k8s:
     src: "{{ k8s_registry_deploy_manifests_dir }}/{{ item }}"
     state: present
   loop: "{{ k8s_registry_deploy_manifests }}"
-  delegate_to: "{{ groups['k8s-master'][0] }}"
   when:
     - ansible_os_family == "Debian"
   tags:

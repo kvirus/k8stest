@@ -17,25 +17,7 @@ spec:
     spec:
       containers:
         - name: "{{ k8s_wordpress_container_config['name'] }}"
-          image: {{ k8s_wordpress_container_config['image'] }}:{{ k8s_wordpress_container_config['tag'] }}
-          env:
-            - name: WORDPRESS_DB_HOST
-              value: "{{ k8s_wordpress_cfg['db_host'] }}"
-            - name: "WORDPRESS_DB_NAME"
-              valueFrom:
-                secretKeyRef:
-                  name: "{{ k8s_wordpress_cfg['secret_name'] }}"
-                  key: "MYSQL_DATABASE"
-            - name: "WORDPRESS_DB_USER"
-              valueFrom:
-                secretKeyRef:
-                  name: "{{ k8s_wordpress_cfg['secret_name'] }}"
-                  key: "MYSQL_USER"
-            - name: "WORDPRESS_DB_PASSWORD"
-              valueFrom:
-                secretKeyRef:
-                  name: "{{ k8s_wordpress_cfg['secret_name'] }}"
-                  key: "MYSQL_PASSWORD"
+          image: "{{ k8s_wordpress_container_config['image'] }}:{{ k8s_wordpress_container_config['tag'] }}"
           ports:
             - containerPort: {{ k8s_wordpress_cfg['port'] }}
           volumeMounts:

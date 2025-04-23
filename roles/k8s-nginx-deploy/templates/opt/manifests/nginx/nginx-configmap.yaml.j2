@@ -40,14 +40,17 @@ data:
 
         include /etc/nginx/sites-available/*;
     }
+
   wordpress.conf: |
     upstream wordpress_local {
-        server wordpress-service:80;
+        server "{{ k8s_nginx_wordpress_cfg['service_name'] }}.{{ k8s_nginx_wordpress_cfg['namespace'] }}.svc.cluster.local:80";
     }
+
   registry.conf: |
     upstream registry_upstream {
-        server registry:5000;
+        server "{{ k8s_nginx_registry_cfg['service_name'] }}.{{ k8s_nginx_registry_cfg['namespace'] }}.svc.cluster.local:5000";
     }
+
   wordpress.local.conf: |
     server {
     listen 443 ssl;
@@ -71,11 +74,12 @@ data:
           proxy_set_header SSL_PROTOCOL $ssl_protocol;
       }
     }
+
   registry.local.conf: |
     server {
         listen 443 ssl;
         http2 on;
-        server_name registry;
+        server_name registry, www.registry;
 
         ssl_certificate /etc/nginx/ssl/registry.crt;
         ssl_certificate_key /etc/nginx/ssl/registry.key;
@@ -87,6 +91,7 @@ data:
             proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         }
     }
+
   default.conf: |
     server {
     listen 80;
@@ -105,9 +110,9 @@ data:
         add_header Content-Type text/html;
         return 200 '<html><head><title>200 OK</title></head><body><h1>200 OK</h1><p>This is 200!</p></body></html>';
     }
-
+    location /image/ {
+        root /usr/share/nginx/html;
+    }
     #access_log  /var/log/nginx/host.access.log  main;
 
     }
-
-

@@ -4,6 +4,8 @@
   file:
     path: "{{ item['path'] }}"
     mode: "{{ item['mode'] | d('0744') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
     state: "directory"
     recurse: true
   loop:
@@ -13,12 +15,30 @@
   tags:
     - k8s-nginx-deploy
 
-- name: "Создание Namespace"
-  kubernetes.core.k8s:
-    name: "{{ k8s_nginx_deploy_cfg['namespace'] }}"
-    api_version: "v1"
-    kind: "Namespace"
-    state: present
+- name: "Создание директории для хранения статики"
+  file:
+    path: "{{ item['path'] }}"
+    mode: "{{ item['mode'] | d('0744') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    state: "directory"
+  loop:
+    - { path: "{{ k8s_nginx_static_dir }}" }
+  delegate_to: "{{ groups['k8s-workers'][1] }}"
+  when:
+    - ansible_os_family == "Debian"
+  tags:
+    - k8s-mysql-deploy
+
+- name: "Копируем статические ресурсы"
+  copy:
+    src: "{{ item['src'] }}"
+    dest: "{{ item['dest'] }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
+    mode: "{{ item['mode'] | d('0644') }}"
+  loop:
+    - { src: "usr/share/nginx/html/devops.png", dest: "{{ k8s_nginx_static_dir }}/devops.png" } # КУДА КОПИРУЕМ!!!
   when:
     - ansible_os_family == "Debian"
   tags:
@@ -32,22 +52,32 @@
     group: "{{ item['group'] | d('root') }}"
     mode: "{{ item['mode'] | d('0644') }}"
   loop:
-    - { src: "opt/manifests/nginxwp/nginx-configmap.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-configmap.yaml"}
-    - { src: "opt/manifests/nginxwp/nginx-deploy.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-deploy.yaml"}
-    - { src: "opt/manifests/nginxwp/nginx-service.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-service.yaml"}
-    - { src: "opt/manifests/nginxwp/nginx-secret.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-secret.yaml"}
-    - { src: "opt/manifests/nginxwp/nginx-wordpress-ingress.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-wordpress-ingress.yaml"}
+    - { src: "opt/manifests/nginx/nginx-namespace.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-namespace.yaml"}
+    - { src: "opt/manifests/nginx/nginx-configmap.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-configmap.yaml"}
+    - { src: "opt/manifests/nginx/nginx-deploy.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-deploy.yaml"}
+    - { src: "opt/manifests/nginx/nginx-service.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-service.yaml"}
+    - { src: "opt/manifests/nginx/nginx-secret.yaml.j2", dest: "{{ k8s_nginx_deploy_manifests_dir }}/nginx-secret.yaml"}
   when:
     - ansible_os_family == "Debian"
   tags:
     - k8s-nginx-deploy
+
+# - name: "Создание Namespace"
+#   kubernetes.core.k8s:
+#     name: "{{ k8s_nginx_deploy_cfg['namespace'] }}"
+#     api_version: "v1"
+#     kind: "Namespace"
+#     state: present
+#   when:
+#     - ansible_os_family == "Debian"
+#   tags:
+#     - k8s-nginx-deploy
 
 - name: "Деплой манифестов Nginx"
   kubernetes.core.k8s:
     src: "{{ k8s_nginx_deploy_manifests_dir }}/{{ item }}"
     state: present
   loop: "{{ k8s_nginx_deploy_manifests }}"
-  delegate_to: "{{ groups['k8s-master'][0] }}"
   when:
     - ansible_os_family == "Debian"
   tags:

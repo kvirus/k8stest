@@ -3,6 +3,7 @@
 k8s_registry_deploy_manifests_dir: "/opt/manifests/registry"
 
 k8s_registry_deploy_manifests:
+  - registry-namespace.yaml
   - registry-deploy.yaml
   - registry-service.yaml
 
@@ -13,9 +14,9 @@ k8s_registry_deploy_container_config:
 
 k8s_registry_deploy_config:
   deploy_name: "docker-registry"
-  namespace: "wordpress"
-  service_name: "registry"
-  node: "back"
+  namespace: "registry" # Registry ?!?!? Тестируем другой Namespace - по умолчанию wordpress
+  service_name: "registry" # Для nginx серсвис registry.registry.svc.cluster.local:5000
+  node: "front"
   container_port: '5000'
   target_port: '5000'
   replicas: '1'

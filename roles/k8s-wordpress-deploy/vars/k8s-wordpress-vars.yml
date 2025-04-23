@@ -2,6 +2,12 @@
 ---
 k8s_wordpress_hostdir: "/mnt/gluster/wordpress"
 
+k8s_wordpress_static:
+  - hostdir: "{{ k8s_wordpress_hostdir }}"
+    host: "{{ groups['k8s-workers'][0] }}"
+  - hostdir: "{{ k8s_wordpress_hostdir }}"
+    host: "{{ groups['k8s-workers'][1] }}"
+
 k8s_wordpress_manifests_dir: "/opt/manifests/wordpress"
 
 k8s_wordpress_deploy_mysql_service: "mysql-service"
@@ -19,17 +25,16 @@ k8s_wordpress_cfg:
   port: '80'
   targetport: '80'
   deploy_name: "wordpress"
-  replicas: '1' # ТЕСТ ИСПРАВИТЬ на 2!!!!
+  replicas: '2'
   protocol: "TCP"
   service_type: "ClusterIP"
   storage_name: "wordpress-storage"
-  db_host: "mysql-service"
+  db_service: "mysql-service"
   configmap_name: "wp-config"
   config_name: "wps-conf"
 
 k8s_wordpress_manifests:
-  - wordpress-secrets.yaml
-  - wordpress-deploy-configmap.yaml
+  - wordpress-namespace.yaml
+  - wordpress-configmap.yaml
   - wordpress-deploy.yaml
-  - wordpress-deploy-service.yaml
-
+  - wordpress-service.yaml

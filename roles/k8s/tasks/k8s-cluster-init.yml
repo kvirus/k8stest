@@ -15,6 +15,8 @@
   file:
     path: "{{ item['path'] }}"
     mode: "{{ item['mode'] | d('0744') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
     state: "directory"
   loop:
     - { path: "{{ k8s_config['config_dir'] }}" }
@@ -30,6 +32,8 @@
     src: "{{ item['src'] }}"
     dest: "{{ item['dest'] }}"
     mode: "{{ item['mode'] | d('0600') }}"
+    owner: "{{ item['owner'] | d('root') }}"
+    group: "{{ item['group'] | d('root') }}"
     remote_src: true
   loop:
     - { src: "{{ k8s_config['cfg_file'] }}", dest: "{{ k8s_config['copy_config_dir'] }}" }
@@ -72,16 +76,30 @@
   command: "{{ k8s_join_command }}"
   when:
     - k8s_join_command is defined
-    - inventory_hostname in groups 'workers'
+    - inventory_hostname in groups 'k8s-workers'
   tags:
     - k8s
     - k8s-cluster-init
 
-- name: "Установка лейблов для нод"
-  command: "kubectl label node {{ item['name'] }} role={{ item['role'] }}"
+# - name: "Установка лейблов для нод"
+#   command: "kubectl label node {{ item['name'] }} role={{ item['role'] }}"
+#   loop: "{{ k8s_worker_label }}"
+#   when:
+#     - inventory_hostname in groups 'k8s-workers'
+#   tags:
+#     - k8s
+#     - k8s-cluster-init
+
+- name: "Устанавливаем лейблы на ноды"
+  kubernetes.core.k8s:
+    api_version: v1
+    kind: Node
+    name: "{{ item['name'] }}"
+    definition:
+      metadata:
+        labels:
+          role: "{{ item['role'] }}"
   loop: "{{ k8s_worker_label }}"
-  when:
-    - inventory_hostname in groups 'workers'
   tags:
     - k8s
-    - k8s-cluster-init
+    - k8s-cluster-ini
